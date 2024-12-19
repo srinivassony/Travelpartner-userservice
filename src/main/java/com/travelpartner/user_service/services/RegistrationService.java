@@ -1,6 +1,7 @@
 package com.travelpartner.user_service.services;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.travelpartner.user_service.entity.UserEntity;
 
@@ -13,5 +14,7 @@ public interface RegistrationService {
 	ResponseEntity<?> createUserInfo(@Valid UserEntity userEntity, HttpServletRequest req, HttpServletResponse res);
 
 	ResponseEntity<?> athunticateUser(UserEntity userEntity, HttpServletRequest req, HttpServletResponse res);
+
+    ResponseEntity<?> onBoardinguserInfo(HttpServletRequest req, HttpServletResponse res, String id);
 
 }

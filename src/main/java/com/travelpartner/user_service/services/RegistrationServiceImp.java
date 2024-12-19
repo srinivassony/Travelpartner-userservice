@@ -2,6 +2,7 @@ package com.travelpartner.user_service.services;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.RegistrationDAO;
@@ -64,7 +66,6 @@ public class RegistrationServiceImp implements RegistrationService {
 	@Override
 	public ResponseEntity<?> createUserInfo(@Valid UserEntity userEntity, HttpServletRequest req,
 			HttpServletResponse res) {
-		// TODO Auto-generated method stub
 		Optional<UserEntity> existingUser = registrationDAO.isUserExists(userEntity.getEmail());
 
 		if (existingUser.isPresent()) {
@@ -177,7 +178,51 @@ public class RegistrationServiceImp implements RegistrationService {
 			return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
 		} catch (Exception ex) {
 			// Handle any other exceptions
-			CustomResponse<String> responseBody = new CustomResponse<>("An error occurred", "ERROR",
+			CustomResponse<String> responseBody = new CustomResponse<>(ex.getMessage(), "ERROR",
+					HttpStatus.INTERNAL_SERVER_ERROR.value(), req.getRequestURI(), LocalDateTime.now());
+			return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> onBoardinguserInfo(HttpServletRequest req, HttpServletResponse res, String id) {
+		try {
+			System.out.println("id" + " " + id);
+
+			if (id.isBlank()) {
+
+				String errorMessages = "Id is required!";
+
+				CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+						HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+				return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+			}
+
+			Optional<UserEntity> getUserById = registrationDAO.getUserById(id);
+			System.out.println("getUserById" +" " + getUserById);
+
+			if (getUserById.isEmpty()) {
+				String errorMessages = "User not found!";
+
+				CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+						HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+				return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+			}
+
+			UserEntity userEntity = getUserById.get();
+
+			UserEntity updateUser = registrationDAO.updateUserInfo(userEntity,id);
+
+			CustomResponse<?> responseBody = new CustomResponse<>(updateUser, "INFO", HttpStatus.OK.value(),
+					req.getRequestURI(), LocalDateTime.now());
+
+			return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+		} catch (Exception ex) {
+			// Handle any other exceptions
+			CustomResponse<String> responseBody = new CustomResponse<>(ex.getMessage(), "ERROR",
 					HttpStatus.INTERNAL_SERVER_ERROR.value(), req.getRequestURI(), LocalDateTime.now());
 			return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
