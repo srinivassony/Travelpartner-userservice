@@ -54,6 +54,19 @@ public class UserEntity {
 	@Column(name = "CREATED_BY")
 	private String createdBy;
 
+	@Column(name = "IS_REGISTERED")
+	private Integer isRegistered = 0;
+
+	@Column(name = "INVITE_ON")
+	private String inviteOn;
+
+	@Column(name = "UPDATED_AT")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	private LocalDateTime updatedAt;
+
+	@Column(name = "UPDATED_BY")
+	private String updatedBy;
+
 	public UserEntity() {
 
 	}
@@ -133,5 +146,36 @@ public class UserEntity {
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
+	
+	public String getInviteOn() {
+		return inviteOn;
+	}
 
+	public void setInviteOn(String inviteOn) {
+		this.inviteOn = inviteOn;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public Integer getIsRegistered() {
+		return isRegistered;
+	}
+
+	public void setIsRegistered(Integer isRegistered) {
+		this.isRegistered = isRegistered;
+	}
 }
