@@ -1,12 +1,18 @@
 package com.travelpartner.user_service.utill;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HtmlTemplate {
 
+	@Autowired
+	private EnvConfig envConfig;
+
 	public String InviteUser(String id, String userName) {
-		String signInUrl = "http://localhost:9093/api/v1/update/invite/user/" + id;
+		String signInUrl = envConfig.getUserServiceBaseURL()+"/api/v1/update/invite/user/" + id;
+
+		System.out.println(signInUrl);
 
 		return "<div style=\"width: 100% !important; height: 100%; background: #ffffff;font-size: 16px;\">"
 				+ "<div style=\"display: block !important; clear: both !important; margin: 0 auto !important; max-width: 700px !important; font-size: 13px; color: #2F2D46\">"

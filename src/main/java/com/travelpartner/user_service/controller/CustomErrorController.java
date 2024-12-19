@@ -48,9 +48,7 @@ public class CustomErrorController implements ErrorController {
 					HttpStatus.FORBIDDEN.value(), request.getRequestURI(), LocalDateTime.now());
 
 			return new ResponseEntity<>(responseBody, HttpStatus.FORBIDDEN);
-		}
-
-		else {
+		} else {
 			System.out.println("herrrrrrr");
 
 			String errorMessages = "Something went wrong!";
