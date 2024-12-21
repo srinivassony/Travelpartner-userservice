@@ -21,161 +21,276 @@ import jakarta.validation.constraints.Size;
 @Table(name = "tp_user")
 public class UserEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(name = "id")
-	private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
+    private String id;
 
-	@NotBlank(message = "Username is required!")
-	@Size(min = 2, max = 50, message = "Username must be between 2 and 50 characters")
-	@Column(name = "USER_NAME", nullable = false)
-	private String userName;
+    @NotBlank(message = "Username is required!")
+    @Size(min = 2, max = 50, message = "Username must be between 2 and 50 characters")
+    @Column(name = "USER_NAME", nullable = false)
+    private String userName;
 
-	@Column(name = "EMAIL", unique = true, nullable = false)
-	@NotBlank(message = "Email is required")
+    @Column(name = "EMAIL", unique = true, nullable = false)
+    @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
-	private String email;
+    private String email;
 
-	@NotBlank(message = "Password is required!")
-	@NotNull(message = "Password must not be null")
-	@Column(name = "PASSWORD", nullable = false)
-	private String password;
+    @NotBlank(message = "Password is required!")
+    @NotNull(message = "Password must not be null")
+    @Column(name = "PASSWORD", nullable = false)
+    private String password;
 
-	@Column(name = "ROLE", nullable = false)
-	private String role;
+    @Column(name = "ROLE", nullable = false)
+    private String role;
 
-	@Column(name = "UUID", nullable = false)
-	private String uuid;
+    @Column(name = "UUID", nullable = false)
+    private String uuid;
 
-	@Column(name = "CREATED_AT")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-	private LocalDateTime createdAt;
+    @Column(name = "CREATED_AT")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime createdAt;
 
-	@Column(name = "CREATED_BY")
-	private String createdBy;
+    @Column(name = "CREATED_BY")
+    private String createdBy;
 
-	@Column(name = "IS_REGISTERED")
-	private Integer isRegistered = 0;
+    @Column(name = "IS_REGISTERED")
+    private Integer isRegistered = 0;
 
-	@Column(name = "INVITE_ON")
-	private String inviteOn;
+    @Column(name = "INVITE_ON")
+    private String inviteOn;
 
-	@Column(name = "UPDATED_AT")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-	private LocalDateTime updatedAt;
+    @Column(name = "UPDATED_AT")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime updatedAt;
 
-	@Column(name = "UPDATED_BY")
-	private String updatedBy;
+    @Column(name = "UPDATED_BY")
+    private String updatedBy;
 
-	public UserEntity() {
+    @Column(name = "PHONE")
+    @Size(max = 10, message = "Please enter a valid phone number")
+    private int phone;
 
-	}
+    @Column(name = "DOB")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private String dob;
 
-	public UserEntity(String userName, String email, String role, String password, String uuid, LocalDateTime createdAt,
-			String createdBy) {
-		this.userName = userName;
-		this.email = email;
-		this.role = role;
-		this.password = password;
-		this.uuid = uuid;
-		this.createdAt = createdAt;
-		this.createdBy = createdBy;
-		// Initialize other fields if necessary
-	}
+    @Column(name = "COUNTRY")
+    private String country;
 
-	public String getId() {
-		return id;
-	}
+    @Column(name = "STATE")
+    private String state;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    @Column(name = "GENDER")
+    private String gender;
 
-	public String getUserName() {
-		return userName;
-	}
+    @Column(name = "IS_INVITED")
+    private int isInvited = 0;
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    @Column(name = "LOGIN")
+    private int login = 0;
 
-	public String getEmail() {
-		return email;
-	}
+    @Column(name = "LOGIN_UPDATED_AT")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime loginUpdatedAt;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    @Column(name = "LOGOUT")
+    private int logout = 0;
 
-	public String getPassword() {
-		return password;
-	}
+    @Column(name = "LOGOUT_UPDATED_AT")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime logoutUpdatedAt;
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public UserEntity() {
 
-	public String getRole() {
-		return role;
-	}
+    }
 
-	public void setRole(String role) {
-		this.role = role;
-	}
+    public UserEntity(String userName, String email, String role, String password, String uuid, LocalDateTime createdAt,
+            String createdBy) {
+        this.userName = userName;
+        this.email = email;
+        this.role = role;
+        this.password = password;
+        this.uuid = uuid;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        // Initialize other fields if necessary
+    }
 
-	public String getUuid() {
-		return uuid;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
+    public String getUserName() {
+        return userName;
+    }
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public String getCreatedBy() {
-		return createdBy;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-	
-	public String getInviteOn() {
-		return inviteOn;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public void setInviteOn(String inviteOn) {
-		this.inviteOn = inviteOn;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
+    public String getRole() {
+        return role;
+    }
 
-	public String getUpdatedBy() {
-		return updatedBy;
-	}
+    public void setRole(String role) {
+        this.role = role;
+    }
 
-	public void setUpdatedBy(String updatedBy) {
-		this.updatedBy = updatedBy;
-	}
+    public String getUuid() {
+        return uuid;
+    }
 
-	public Integer getIsRegistered() {
-		return isRegistered;
-	}
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
-	public void setIsRegistered(Integer isRegistered) {
-		this.isRegistered = isRegistered;
-	}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getInviteOn() {
+        return inviteOn;
+    }
+
+    public void setInviteOn(String inviteOn) {
+        this.inviteOn = inviteOn;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Integer getIsRegistered() {
+        return isRegistered;
+    }
+
+    public void setIsRegistered(Integer isRegistered) {
+        this.isRegistered = isRegistered;
+    }
+
+    public int getPhone() {
+        return phone;
+    }
+
+    public void setPhone(int phone) {
+        this.phone = phone;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public int getIsInvited() {
+        return isInvited;
+    }
+
+    public void setIsInvited(int isInvited) {
+        this.isInvited = isInvited;
+    }
+
+    public int getLogin() {
+        return login;
+    }
+
+    public void setLogin(int login) {
+        this.login = login;
+    }
+
+    public LocalDateTime getLoginUpdatedAt() {
+        return loginUpdatedAt;
+    }
+
+    public void setLoginUpdatedAt(LocalDateTime loginUpdatedAt) {
+        this.loginUpdatedAt = loginUpdatedAt;
+    }
+
+    public int getLogout() {
+        return logout;
+    }
+
+    public void setLogout(int logout) {
+        this.logout = logout;
+    }
+
+    public LocalDateTime getLogoutUpdatedAt() {
+        return logoutUpdatedAt;
+    }
+
+    public void setLogoutUpdatedAt(LocalDateTime logoutUpdatedAt) {
+        this.logoutUpdatedAt = logoutUpdatedAt;
+    }
+
 }
