@@ -18,6 +18,7 @@ public class UserInfoDTO implements UserDetails {
 	private String email;
 	private String password;
 	private List<GrantedAuthority> authorities;
+	private String uuid;
 	
 	
 
@@ -29,6 +30,7 @@ public class UserInfoDTO implements UserDetails {
 		this.password = userEntity.getPassword();
 		this.authorities = Arrays.stream(userEntity.getRole().split(",")).map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
+		this.uuid = userEntity.getUuid();
 	}
 
 	@Override
@@ -92,7 +94,13 @@ public class UserInfoDTO implements UserDetails {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	
-	
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
 
 }
