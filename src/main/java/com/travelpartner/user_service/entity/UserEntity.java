@@ -13,8 +13,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -68,8 +71,11 @@ public class UserEntity {
     private String updatedBy;
 
     @Column(name = "PHONE")
-    @Size(max = 10, message = "Please enter a valid phone number")
-    private int phone;
+    // @Size(max = 10, message = "Please enter a valid phone number")
+    // @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be exactly 10 digits")
+    // @Min(value = 1000000000L, message = "Phone number must be exactly 10 digits")
+    // @Max(value = 9999999999L, message = "Phone number must be exactly 10 digits")
+    private String phone;
 
     @Column(name = "DOB")
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -213,14 +219,6 @@ public class UserEntity {
         this.isRegistered = isRegistered;
     }
 
-    public int getPhone() {
-        return phone;
-    }
-
-    public void setPhone(int phone) {
-        this.phone = phone;
-    }
-
     public String getDob() {
         return dob;
     }
@@ -291,6 +289,14 @@ public class UserEntity {
 
     public void setLogoutUpdatedAt(LocalDateTime logoutUpdatedAt) {
         this.logoutUpdatedAt = logoutUpdatedAt;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
 }
