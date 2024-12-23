@@ -1,23 +1,21 @@
 package com.travelpartner.user_service.entity;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -71,10 +69,6 @@ public class UserEntity {
     private String updatedBy;
 
     @Column(name = "PHONE")
-    // @Size(max = 10, message = "Please enter a valid phone number")
-    // @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be exactly 10 digits")
-    // @Min(value = 1000000000L, message = "Phone number must be exactly 10 digits")
-    // @Max(value = 9999999999L, message = "Phone number must be exactly 10 digits")
     private String phone;
 
     @Column(name = "DOB")
@@ -106,6 +100,9 @@ public class UserEntity {
     @Column(name = "LOGOUT_UPDATED_AT")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime logoutUpdatedAt;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserProfilePicEntity profilePic;
 
     public UserEntity() {
 
@@ -297,6 +294,14 @@ public class UserEntity {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public UserProfilePicEntity getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(UserProfilePicEntity profilePic) {
+        this.profilePic = profilePic;
     }
 
 }
