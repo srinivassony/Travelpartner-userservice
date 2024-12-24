@@ -1,8 +1,11 @@
 package com.travelpartner.user_service.utill;
 
+import org.springframework.stereotype.Component;
+
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
 
+@Component
 public class UtillDTO {
     
     public UserProfilePicDTO convertToUserProfileDTO(UserProfilePicEntity entity) {
@@ -14,7 +17,8 @@ public class UtillDTO {
                 entity.getCreatedAt(),
                 entity.getCreatedBy(),
                 entity.getUpdatedAt(),
-                entity.getUpdatedBy()
+                entity.getUpdatedBy(),
+                entity.getUser().getId()
                 );
     }
 }

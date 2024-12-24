@@ -25,6 +25,7 @@ public class UserDAOImp implements UserDAO {
     @Autowired
     UserProfilePicRepo userProfilePicRepo;
 
+    @Autowired
     UtillDTO utillDTO;
 
     @Override
