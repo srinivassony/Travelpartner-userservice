@@ -81,8 +81,9 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public UserProfilePicEntity createProfilePic(UserProfilePicEntity userProfilePic) {
-        return userProfilePicRepo.save(userProfilePic);
+    public UserProfilePicDTO createProfilePic(UserProfilePicEntity userProfilePic) {
+        UserProfilePicEntity userProfilePicEntity =  userProfilePicRepo.save(userProfilePic);
+         return utillDTO.convertToUserProfileDTO(userProfilePicEntity);
     }
 
     @Override
@@ -92,12 +93,9 @@ public class UserDAOImp implements UserDAO {
             entity.setProfilePicName(fileName);
             entity.setUpdatedAt(LocalDateTime.now());
             entity.setUpdatedBy(uuid);
-
             UserProfilePicEntity userProfilePicEntity = userProfilePicRepo.save(entity);
-
             // Convert entity to DTO and return
             return utillDTO.convertToUserProfileDTO(userProfilePicEntity);
-
         }).orElseThrow(() -> new UsernameNotFoundException("User profile pic is not updated for this id: " + id));
     }
 }

@@ -82,6 +82,22 @@ public class UserServiceImp implements UserService {
 
             String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
+            if (file == null || file.isEmpty()) {
+                String errorMessage = "No file provided or file is empty.";
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessage, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
+            if (!fileName.matches(".*\\.(png|jpg|jpeg)$")) {
+                String errorMessages = "Invalid file type. Only PNG, JPG, JPEG files are allowed!";
+            
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
             if (getImageInfo.isEmpty()) {
                 String profilePicId =  UUID.randomUUID().toString();
                 System.out.println("82222222"+" "+profilePicId);
@@ -104,7 +120,7 @@ public class UserServiceImp implements UserService {
                 userProfilePic.setPath(userUploadPath.toString());
                 userProfilePic.setUser(userInfo.get());
 
-                UserProfilePicEntity createUserProfilePic = userDAO.createProfilePic(userProfilePic);
+                UserProfilePicDTO createUserProfilePic = userDAO.createProfilePic(userProfilePic);
 
                 CustomResponse<?> responseBody = new CustomResponse<>(createUserProfilePic, "UPDATED",
                         HttpStatus.OK.value(),
@@ -123,9 +139,19 @@ public class UserServiceImp implements UserService {
                     Files.delete(userUploadPath);
                     System.out.println("Old file deleted successfully: " + userUploadPath);
                 } else if (Files.isDirectory(userUploadPath)) {
-                    System.out.println("Path is a directory, not a file: " + userUploadPath);
+                    String errorMessages = "Path is a directory, not a file: " + userUploadPath;
+            
+                    CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                            HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+                
+                    return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
                 } else {
-                    System.out.println("File does not exist: " + userUploadPath);
+                    String errorMessages = "File does not exist: " + userUploadPath;
+            
+                    CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                            HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+                
+                    return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
                 }
 
                 // Resolve the new file path

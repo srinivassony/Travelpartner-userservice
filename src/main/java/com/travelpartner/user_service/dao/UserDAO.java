@@ -17,7 +17,7 @@ public interface UserDAO {
 
     Optional<UserEntity> getUserById(String id);
 
-    UserProfilePicEntity createProfilePic(UserProfilePicEntity userProfilePic);
+    UserProfilePicDTO createProfilePic(UserProfilePicEntity userProfilePic);
 
     UserProfilePicDTO updateProfilePic(String fileName, String id, String uuid);
 }
