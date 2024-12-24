@@ -7,9 +7,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,14 +26,11 @@ public class GalleryEntity {
 	@Column(name = "ID", nullable = false)
 	private String id;
 	
-	@Column(name = "IMAGE_ID")
+	@Column(name = "IMAGE_ID", nullable = false)
 	private String imageId;
 	
-	@Column(name ="FILE_NAME")
+	@Column(name = "FILE_NAME", nullable = false)
 	private String fileName;
-	
-	@Column(name = "USER_ID", nullable = false)
-	private String userId;
 	
 	@Column(name = "CREATED_AT")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -43,6 +45,10 @@ public class GalleryEntity {
 	
 	@Column(name = "UPDATED_BY")
 	private String updatedBy;
+	
+    @ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "USER_ID", referencedColumnName = "id", nullable = false)
+	private UserEntity userGallery;
 
 	public String getId() {
 		return id;
@@ -66,14 +72,6 @@ public class GalleryEntity {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public LocalDateTime getCreatedAt() {

@@ -1,6 +1,7 @@
 package com.travelpartner.user_service.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -11,6 +12,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -103,6 +105,9 @@ public class UserEntity {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfilePicEntity profilePic;
+
+    @OneToMany(mappedBy = "userGallery", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<GalleryEntity> galleryEntities;
 
     public UserEntity() {
 
