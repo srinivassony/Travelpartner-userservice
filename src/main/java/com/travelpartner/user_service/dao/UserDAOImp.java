@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
+import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
+import com.travelpartner.user_service.repository.UserGalleryRepo;
 import com.travelpartner.user_service.repository.UserProfilePicRepo;
 import com.travelpartner.user_service.repository.UserRepository;
 import com.travelpartner.user_service.utill.UtillDTO;
@@ -24,6 +27,9 @@ public class UserDAOImp implements UserDAO {
 
     @Autowired
     UserProfilePicRepo userProfilePicRepo;
+
+    @Autowired
+    UserGalleryRepo userGalleryRepo;
 
     @Autowired
     UtillDTO utillDTO;
@@ -97,6 +103,12 @@ public class UserDAOImp implements UserDAO {
             // Convert entity to DTO and return
             return utillDTO.convertToUserProfileDTO(userProfilePicEntity);
         }).orElseThrow(() -> new UsernameNotFoundException("User profile pic is not updated for this id: " + id));
+    }
+
+    @Override
+    public UserGalleryDTO createUserImages(UserGalleryEntity userGalleryEntity) {
+        UserGalleryEntity galleryEntity =  userGalleryRepo.save(userGalleryEntity);
+        return utillDTO.convertToUserGalleryDTO(galleryEntity);
     }
 }
 

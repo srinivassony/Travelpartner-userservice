@@ -74,4 +74,13 @@ public class HomeController {
         return userService.updateUserInfo(userDetails, userServiceDTO, req, res);
     }
 
+    @PostMapping("/user/upload/images")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> uploadMultipleImages(HttpServletRequest req,
+            HttpServletResponse res, @RequestParam("files") MultipartFile[] files) {
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
+        System.out.println(userDetails.getUuid());
+        
+        return userService.uploadMultipleImages(req, res, userDetails, files);
+    }
 }

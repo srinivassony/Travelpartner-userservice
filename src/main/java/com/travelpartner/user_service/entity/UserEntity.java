@@ -107,7 +107,7 @@ public class UserEntity {
     private UserProfilePicEntity profilePic;
 
     @OneToMany(mappedBy = "userGallery", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<GalleryEntity> galleryEntities;
+    private List<UserGalleryEntity> galleryEntities;
 
     public UserEntity() {
 

@@ -17,4 +17,7 @@ public interface UserService {
     ResponseEntity<?> uploadUserPic(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails,
             MultipartFile file);
 
+ResponseEntity<?> uploadMultipleImages(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails,
+                MultipartFile[] files);
+
 }
