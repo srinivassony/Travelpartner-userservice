@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 .metadata/
 uploads/
+gallery/
 
 ### STS ###
 .apt_generated

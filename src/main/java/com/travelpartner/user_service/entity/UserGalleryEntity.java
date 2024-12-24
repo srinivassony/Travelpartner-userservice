@@ -1,7 +1,6 @@
 package com.travelpartner.user_service.entity;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -13,13 +12,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name="tp_gallery")
-public class GalleryEntity {
+public class UserGalleryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -104,6 +101,14 @@ public class GalleryEntity {
 
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+
+	public UserEntity getUserGallery() {
+		return userGallery;
+	}
+
+	public void setUserGallery(UserEntity userGallery) {
+		this.userGallery = userGallery;
 	}
 	 
 }
