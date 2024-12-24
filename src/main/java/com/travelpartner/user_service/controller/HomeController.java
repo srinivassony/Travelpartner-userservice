@@ -44,8 +44,8 @@ public class HomeController {
             HttpServletResponse res, @RequestParam("file") MultipartFile file) {
         UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
         System.out.println(userDetails.getUuid());
-        
-        return userService.uploadUserPic(req, res,userDetails,file);
+
+        return userService.uploadUserPic(req, res, userDetails, file);
     }
 
     @PostMapping("/user/update")
@@ -53,23 +53,23 @@ public class HomeController {
     public ResponseEntity<?> updateUser(HttpServletRequest req,
             HttpServletResponse res, @Valid @RequestBody UserServiceDTO userServiceDTO, BindingResult result) {
         // Normalize file name
-        
+
         UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
 
         if (result.hasErrors()) {
 
-			// Collecting error messages
-			StringBuilder errorMessages = new StringBuilder();
+            // Collecting error messages
+            StringBuilder errorMessages = new StringBuilder();
 
-			result.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append("; "));
+            result.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append("; "));
 
-			System.out.println("errorMessages" + " " + errorMessages);
+            System.out.println("errorMessages" + " " + errorMessages);
 
-			CustomResponse<String> responseBody = new CustomResponse<>(errorMessages.toString(), "BAD_REQUEST",
-					HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            CustomResponse<String> responseBody = new CustomResponse<>(errorMessages.toString(), "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
 
-			return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
-		}
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
 
         return userService.updateUserInfo(userDetails, userServiceDTO, req, res);
     }
@@ -80,7 +80,18 @@ public class HomeController {
             HttpServletResponse res, @RequestParam("files") MultipartFile[] files) {
         UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
         System.out.println(userDetails.getUuid());
-        
+
         return userService.uploadMultipleImages(req, res, userDetails, files);
     }
+
+    @GetMapping("/get/user/details")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> getUserDetailsById(HttpServletRequest req, HttpServletResponse res) {
+
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
+
+        return userService.getUserDetailsById(req, res, userDetails);
+
+    }
+
 }

@@ -20,4 +20,6 @@ public interface UserService {
 ResponseEntity<?> uploadMultipleImages(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails,
                 MultipartFile[] files);
 
+ResponseEntity<?> getUserDetailsById(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails);
+
 }

@@ -24,4 +24,6 @@ public interface UserDAO {
     UserProfilePicDTO updateProfilePic(String fileName, String id, String uuid);
 
     UserGalleryDTO createUserImages(UserGalleryEntity userGalleryEntity);
+
+    Optional<UserEntity> getUserInfoById(String id);
 }
