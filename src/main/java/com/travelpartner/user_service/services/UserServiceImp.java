@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.UserDAO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
+import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
@@ -137,7 +138,7 @@ public class UserServiceImp implements UserService {
                 // Transfer the new file to the resolved path
                 file.transferTo(newFilePath.toFile());
 
-                UserProfilePicEntity updateUserProfilePic = userDAO.updateProfilePic(newFileName,
+                UserProfilePicDTO updateUserProfilePic = userDAO.updateProfilePic(newFileName,
                         getImageInfo.get().getId(), userInfo.get().getUuid());
 
                 CustomResponse<?> responseBody = new CustomResponse<>(updateUserProfilePic, "UPDATED",
