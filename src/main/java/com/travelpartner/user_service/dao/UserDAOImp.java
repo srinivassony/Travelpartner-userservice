@@ -8,11 +8,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.travelpartner.user_service.dto.UserInfoDTO;
+import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
 import com.travelpartner.user_service.repository.UserProfilePicRepo;
 import com.travelpartner.user_service.repository.UserRepository;
+import com.travelpartner.user_service.utill.UtillDTO;
 
 @Service
 public class UserDAOImp implements UserDAO {
@@ -22,6 +24,9 @@ public class UserDAOImp implements UserDAO {
 
     @Autowired
     UserProfilePicRepo userProfilePicRepo;
+
+    @Autowired
+    UtillDTO utillDTO;
 
     @Override
     public UserEntity updateUserInfo(UserServiceDTO userServiceDTO, UserInfoDTO userDetails) {
@@ -76,21 +81,22 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public UserProfilePicEntity createProfilePic(UserProfilePicEntity userProfilePic) {
-        return userProfilePicRepo.save(userProfilePic);
+    public UserProfilePicDTO createProfilePic(UserProfilePicEntity userProfilePic) {
+        UserProfilePicEntity userProfilePicEntity =  userProfilePicRepo.save(userProfilePic);
+         return utillDTO.convertToUserProfileDTO(userProfilePicEntity);
     }
 
     @Override
-    public UserProfilePicEntity updateProfilePic(String fileName, String id, String uuid) {
-        return userProfilePicRepo.findById(id) .map(entity -> {
+    public UserProfilePicDTO updateProfilePic(String fileName, String id, String uuid) {
+        return userProfilePicRepo.findById(id).map(entity -> {
             // Update other fields as needed
             entity.setProfilePicName(fileName);
             entity.setUpdatedAt(LocalDateTime.now());
             entity.setUpdatedBy(uuid);
-
-            return userProfilePicRepo.save(entity);
-
+            UserProfilePicEntity userProfilePicEntity = userProfilePicRepo.save(entity);
+            // Convert entity to DTO and return
+            return utillDTO.convertToUserProfileDTO(userProfilePicEntity);
         }).orElseThrow(() -> new UsernameNotFoundException("User profile pic is not updated for this id: " + id));
     }
-    }
+}
 

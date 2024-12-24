@@ -1,53 +1,47 @@
-package com.travelpartner.user_service.entity;
+package com.travelpartner.user_service.dto;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.travelpartner.user_service.entity.UserEntity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "tp_image")
-public class UserProfilePicEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
+public class UserProfilePicDTO {
+    
     private String id;
 
-    @Column(name = "PROFILEPIC_ID" ,nullable = false)
     private String profilePicId;
 
-    @Column(name = "PROFILEPIC_NAME",nullable = false)
     private String profilePicName;
 
-    @Column(name = "PATH")
     private String path;
-
-    @Column(name = "CREATED_AT")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+   
     private LocalDateTime createdAt;
 
-    @Column(name = "CREATED_BY")
     private String createdBy;
     
-    @Column(name = "UPDATED_AT")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    @Column(name = "UPDATED_BY")
     private String updatedBy;
 
-    @OneToOne
-    @JoinColumn(name = "USER_ID", referencedColumnName = "id", nullable = false)
     private UserEntity user;
+
+    private String userId;
+
+    public UserProfilePicDTO() {
+
+    }
+    
+    public UserProfilePicDTO(String id, String profilePicId, String profilePicName, String path,
+            LocalDateTime createdAt, String createdBy, LocalDateTime updatedAt, String updatedBy, String userId) {
+        this.id = id;
+        this.profilePicId = profilePicId;
+        this.profilePicName = profilePicName;
+        this.path = path;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
+        this.userId = userId;
+    }
 
     public String getId() {
         return id;
@@ -121,4 +115,11 @@ public class UserProfilePicEntity {
         this.user = user;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 }
