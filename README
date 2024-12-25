@@ -1,0 +1,7 @@
+Before start the user service we need to exceuted the below commands
+
+zookeeper cmd
+bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+server cmd
+bin\windows\kafka-server-start.bat config\server.properties

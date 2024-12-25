@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.RegistrationDAO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
+import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.kafka.UserEmailProducer;
 import com.travelpartner.user_service.utill.HtmlTemplate;
@@ -63,70 +64,92 @@ public class RegistrationServiceImp implements RegistrationService {
     @Autowired
     HtmlTemplate htmlTemplate;
 
+    @Autowired
+    Utills utills;
+
     @Override
-    public ResponseEntity<?> createUserInfo(@Valid UserEntity userEntity, HttpServletRequest req,
+    public ResponseEntity<?> createUserInfo(@Valid UserServiceDTO userServiceDTO, HttpServletRequest req,
             HttpServletResponse res) {
-        Optional<UserEntity> existingUser = registrationDAO.isUserExists(userEntity.getEmail());
+        try {
+            Optional<UserEntity> existingUser = registrationDAO.isUserExists(userServiceDTO.getEmail());
 
-        if (existingUser.isPresent()) {
+            if (existingUser.isPresent()) {
 
-            String errorMessages = "User email already exists. Try with a different email.";
+                String errorMessages = "User email already exists. Try with a different email.";
 
-            CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                // If the user exists, return a message with a bad status
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
+            String userName = userServiceDTO.getUserName() != null ? userServiceDTO.getUserName() : null;
+
+            String email = userServiceDTO.getEmail() != null ? userServiceDTO.getEmail() : null;
+
+            String role;
+            if (userServiceDTO.getIsAdmin() != null) {
+                role = "ROLE_ADMIN,";
+            } else {
+                role = "ROLE_USER,";
+            }
+
+            String password = userServiceDTO.getPassword() != null
+                    ? passwordEncoder.encode(userServiceDTO.getPassword())
+                    : null;
+
+            String uuid = utill.generateString(36);
+
+            LocalDateTime createdAt = LocalDateTime.now();
+
+            String createdBy = uuid;
+
+            UserEntity userDetails = new UserEntity();
+
+            userDetails.setUserName(userName);
+            userDetails.setEmail(email);
+            userDetails.setPassword(password);
+            userDetails.setRole(role);
+            userDetails.setUuid(uuid);
+            userDetails.setCreatedAt(createdAt);
+            userDetails.setCreatedBy(createdBy);
+
+            UserEntity userInfo = registrationDAO.createUser(userDetails);
+
+            if (userInfo.getId() == null) {
+
+                String errorMessages = "User not created. Please try again!";
+
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                // If the user exists, return a message with a bad status
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
+            String subject = userInfo.getUserName() + " " + "you are invited to Travel-partner";
+            String content = htmlTemplate.InviteUser(userInfo.getId(), userInfo.getUserName());
+
+            // Create a map to store name and id
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("subject", subject);
+            userData.put("toEmailId", userInfo.getEmail());
+            userData.put("content", content);
+
+            userEmailProducer.sendMessage(userData);
+
+            CustomResponse<UserEntity> responseBody = new CustomResponse<>(userInfo, "CREATED", HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            String stackTrace = utills.getStackTraceAsString(e);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(stackTrace, "BAD_REQUEST",
                     HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
-
-            // If the user exists, return a message with a bad status
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
-
-        String userName = userEntity.getUserName() != null ? userEntity.getUserName() : null;
-
-        String email = userEntity.getEmail() != null ? userEntity.getEmail() : null;
-
-        String role = "ROLE_USER,";
-
-        String password = userEntity.getPassword() != null ? passwordEncoder.encode(userEntity.getPassword()) : null;
-
-        String uuid = utill.generateString(36);
-
-        LocalDateTime createdAt = LocalDateTime.now();
-
-        String createdBy = uuid;
-
-        UserEntity userDetails = new UserEntity(userName, email, role, password, uuid, createdAt, createdBy);
-
-        UserEntity userInfo = registrationDAO.createUser(userDetails);
-
-        if (userInfo.getId() == null) {
-
-            System.out.println("user not created!");
-
-            String errorMessages = "User not created. Please try again!";
-
-            CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
-                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
-
-            // If the user exists, return a message with a bad status
-            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
-        }
-
-        System.out.println("userInfo" + " " + userInfo);
-
-        String subject = userInfo.getUserName() + " " + "you are invited to Travel-partner";
-        String content = htmlTemplate.InviteUser(userInfo.getId(), userInfo.getUserName());
-
-        // Create a map to store name and id
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("subject", subject);
-        userData.put("toEmailId", userInfo.getEmail());
-        userData.put("content", content);
-
-        userEmailProducer.sendMessage(userData);
-
-        CustomResponse<UserEntity> responseBody = new CustomResponse<>(userInfo, "CREATED", HttpStatus.OK.value(),
-                req.getRequestURI(), LocalDateTime.now());
-
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.travelpartner.user_service.config.CustomResponse;
+import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.services.RegistrationService;
 
@@ -29,7 +30,7 @@ public class RegistrationController {
 	RegistrationService registrationService;
 
 	@PostMapping("/add/user")
-	public ResponseEntity<?> createUser(@Valid @RequestBody UserEntity userEntity, BindingResult result,
+	public ResponseEntity<?> createUser(@Valid @RequestBody UserServiceDTO userServiceDTO, BindingResult result,
 			HttpServletRequest req, HttpServletResponse res) {
 
 		if (result.hasErrors()) {
@@ -47,7 +48,7 @@ public class RegistrationController {
 			return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
 		}
 
-		return registrationService.createUserInfo(userEntity, req, res);
+		return registrationService.createUserInfo(userServiceDTO, req, res);
 	}
 
 	@PostMapping("/user/authenticate")
@@ -58,10 +59,33 @@ public class RegistrationController {
 
 		return registrationService.athunticateUser(userEntity, req, res);
 	}
-	
+
 	@GetMapping("/update/invite/user/{id}")
-	public ResponseEntity<?> onBoardingUser(@PathVariable("id") String id, HttpServletRequest req, HttpServletResponse res) {
+	public ResponseEntity<?> onBoardingUser(@PathVariable("id") String id, HttpServletRequest req,
+			HttpServletResponse res) {
 		return registrationService.onBoardinguserInfo(req, res, id);
+	}
+
+	@PostMapping("/add/user/admin")
+	public ResponseEntity<?> createUserAdmin(@Valid @RequestBody UserServiceDTO userServiceDTO, BindingResult result,
+			HttpServletRequest req, HttpServletResponse res) {
+
+		if (result.hasErrors()) {
+
+			// Collecting error messages
+			StringBuilder errorMessages = new StringBuilder();
+
+			result.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append("; "));
+
+			System.out.println("errorMessages" + " " + errorMessages);
+
+			CustomResponse<String> responseBody = new CustomResponse<>(errorMessages.toString(), "BAD_REQUEST",
+					HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+			return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+		}
+
+		return registrationService.createUserInfo(userServiceDTO, req, res);
 	}
 
 }
