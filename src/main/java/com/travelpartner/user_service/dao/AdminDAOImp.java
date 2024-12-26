@@ -24,8 +24,10 @@ public class AdminDAOImp implements AdminDAO {
     UtillDTO utillDTO;
 
     @Override
-    public List<UserEntity> getUserRole(String role) {
-        return jpaUserRepo.findByRole(role);
+    public List<UserServiceDTO> getUserRole(String role) {
+        List<UserEntity> userEntity = jpaUserRepo.findByRole(role);
+
+        return utillDTO.convertToUsersDTOList(userEntity);
     }
 
     @Override
@@ -70,5 +72,12 @@ public class AdminDAOImp implements AdminDAO {
                     return utillDTO.convertToUserDTO(userEntity);
 
                 }).orElseThrow(() -> new UsernameNotFoundException("User not found with id " + id));
+    }
+
+    @Override
+    public List<UserServiceDTO> getUserList() {
+        List<UserEntity> userEntity = jpaUserRepo.findAll();
+
+        return utillDTO.convertToUsersDTOList(userEntity);
     }
 }
