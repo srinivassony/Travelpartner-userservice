@@ -1,6 +1,13 @@
 package com.travelpartner.user_service.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +52,36 @@ public class AdminController {
             HttpServletResponse res, @PathVariable("id") String id, @RequestBody UserServiceDTO userServiceDTO) {
         UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
         return adminService.updateUserById(req, res, id, userServiceDTO, userDetails);
+    }
+
+    @GetMapping("/download/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<InputStreamResource> downloadUsersExcel(HttpServletRequest req) {
+        try {
+            // Call the service method to generate the Excel file
+            ByteArrayInputStream excelStream = adminService.downloadUsersExcel(req, null);
+
+            if (excelStream == null) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                        .body(null); // Handle cases where no data is available
+            }
+
+            // Set the response headers for the file download
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=users.xlsx");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM) // Ensure proper MIME type for downloads
+                    .body(new InputStreamResource(excelStream));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Provide a more detailed error message in the response
+            String errorMessage = "Error occurred while generating the Excel file: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new InputStreamResource(new ByteArrayInputStream(errorMessage.getBytes())));
+        }
     }
 
 }

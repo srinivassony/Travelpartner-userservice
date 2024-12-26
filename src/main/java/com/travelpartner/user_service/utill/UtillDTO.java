@@ -1,5 +1,8 @@
 package com.travelpartner.user_service.utill;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 
 import com.travelpartner.user_service.dto.UserGalleryDTO;
@@ -55,4 +58,25 @@ public class UtillDTO {
                 entity.getUserName());
 
     }
+
+    public List<UserServiceDTO> convertToUsersDTOList(List<UserEntity> userEntities) {
+        return userEntities.stream()
+                .map(userEntity -> new UserServiceDTO(
+                        userEntity.getCountry(),
+                        userEntity.getCreatedAt(),
+                        userEntity.getCreatedBy(),
+                        userEntity.getDob(),
+                        userEntity.getEmail(),
+                        userEntity.getGender(),
+                        userEntity.getId(),
+                        userEntity.getPassword(),
+                        userEntity.getPhone(),
+                        userEntity.getRole(),
+                        userEntity.getState(),
+                        userEntity.getUpdatedAt(),
+                        userEntity.getUpdatedBy(),
+                        userEntity.getUserName()))
+                .collect(Collectors.toList());
+    }
+
 }
