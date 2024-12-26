@@ -47,13 +47,14 @@ public class UserServiceImp implements UserService {
     Utills utills;
 
     @Override
-    public ResponseEntity<?> updateUserInfo(UserInfoDTO userDetails, UserServiceDTO userServiceDTO, HttpServletRequest req,
+    public ResponseEntity<?> updateUserInfo(UserInfoDTO userDetails, UserServiceDTO userServiceDTO,
+            HttpServletRequest req,
             HttpServletResponse res) {
         try {
 
             UserEntity updateUser = userDAO.updateUserInfo(userServiceDTO, userDetails);
 
-            System.out.println("GETTING THE UPDATED USER DETAILS" + " " + updateUser );
+            System.out.println("GETTING THE UPDATED USER DETAILS" + " " + updateUser);
 
             CustomResponse<?> responseBody = new CustomResponse<>(updateUser, "UPDATED", HttpStatus.OK.value(),
                     req.getRequestURI(), LocalDateTime.now());
@@ -83,17 +84,16 @@ public class UserServiceImp implements UserService {
 
             if (!fileName.matches(".*\\.(png|jpg|jpeg)$")) {
                 String errorMessages = "Invalid file type. Only PNG, JPG, JPEG files are allowed!";
-            
+
                 CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
                         HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
-            
+
                 return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
             }
 
             Optional<UserEntity> userInfo = userDAO.getUserById(userDetails.getId());
 
-            if(userInfo.isEmpty())
-            {
+            if (userInfo.isEmpty()) {
                 String errorMessages = "User deatils not found!";
 
                 CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
@@ -105,8 +105,8 @@ public class UserServiceImp implements UserService {
             Optional<UserProfilePicEntity> getImageInfo = userDAO.getProfilePicByUserID(userDetails.getId());
 
             if (getImageInfo.isEmpty()) {
-                String profilePicId =  UUID.randomUUID().toString();
-                System.out.println("82222222"+" "+profilePicId);
+                String profilePicId = UUID.randomUUID().toString();
+                System.out.println("82222222" + " " + profilePicId);
 
                 Path userUploadPath = Paths.get(uploadDir, profilePicId);
                 System.out.println(userUploadPath);
@@ -133,10 +133,10 @@ public class UserServiceImp implements UserService {
                         req.getRequestURI(), LocalDateTime.now());
 
                 return new ResponseEntity<>(responseBody, HttpStatus.OK);
-            }
-            else {
+            } else {
                 // Get the old profile pic file path
-                Path userUploadPath = Paths.get(uploadDir, getImageInfo.get().getProfilePicId(),getImageInfo.get().getProfilePicName());
+                Path userUploadPath = Paths.get(uploadDir, getImageInfo.get().getProfilePicId(),
+                        getImageInfo.get().getProfilePicName());
                 System.out.println("userUploadPath " + userUploadPath);
 
                 // Check if the old file exists and delete it
@@ -145,17 +145,17 @@ public class UserServiceImp implements UserService {
                     System.out.println("Old file deleted successfully: " + userUploadPath);
                 } else if (Files.isDirectory(userUploadPath)) {
                     String errorMessages = "Path is a directory, not a file: " + userUploadPath;
-            
+
                     CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
                             HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
-                
+
                     return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
                 } else {
                     String errorMessages = "File does not exist: " + userUploadPath;
-            
+
                     CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
                             HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
-                
+
                     return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
                 }
 
@@ -181,7 +181,7 @@ public class UserServiceImp implements UserService {
 
         } catch (Exception e) {
 
-            String stackTrace = utills.getStackTraceAsString(e); 
+            String stackTrace = utills.getStackTraceAsString(e);
 
             CustomResponse<String> responseBody = new CustomResponse<>(stackTrace, "BAD_REQUEST",
                     HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
@@ -262,6 +262,41 @@ public class UserServiceImp implements UserService {
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @Override
+    public ResponseEntity<?> getUserDetailsById(HttpServletRequest req, HttpServletResponse res,
+            UserInfoDTO userDetails) {
+
+        try {
+
+            Optional<UserEntity> getUserDetails = userDAO.getUserInfoById(userDetails.getId());
+
+            if (getUserDetails.isEmpty()) {
+
+                String errorMessages = "User deatils not found!";
+
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+
+            }
+
+            CustomResponse<?> responseBody = new CustomResponse<>(getUserDetails, "UPDATED",
+                    HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+        } catch (Exception e) {
+
+            String stackTrace = utills.getStackTraceAsString(e);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(stackTrace, "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
