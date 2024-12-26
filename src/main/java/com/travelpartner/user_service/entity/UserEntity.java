@@ -104,8 +104,10 @@ public class UserEntity {
 
     }
 
-    public UserEntity(String userName, String email, String role, String password, String uuid, LocalDateTime createdAt,
+    public UserEntity(String id, String userName, String email, String role, String password, String uuid,
+            LocalDateTime createdAt,
             String createdBy) {
+        this.id = id;
         this.userName = userName;
         this.email = email;
         this.role = role;
