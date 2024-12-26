@@ -101,6 +101,13 @@
 			<artifactId>spring-kafka</artifactId>
 		</dependency>
 
+		<dependency>
+		  <groupId>io.github.cdimascio</groupId>
+		  <artifactId>dotenv-java</artifactId>
+		  <version>3.0.0</version>
+		</dependency>
+
+
 
 	</dependencies>
 
@@ -117,6 +124,10 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+			  <groupId>org.springframework.boot</groupId>
+			  <artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

@@ -55,16 +55,19 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeRequests(authorizeRequests -> authorizeRequests.requestMatchers("/api/v1/**").permitAll() // Public
-				.requestMatchers("/error").permitAll() // endpoints
-//				 .requestMatchers("/login").permitAll()
-				.requestMatchers("/api/v2/**").authenticated() // Secured endpoints
-		).authenticationProvider(authenticationProvider()) // Use your custom AuthenticationProvider
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT filter
-				.csrf(csrf -> csrf.disable()); // Disable CSRF
+		http
+				.csrf(csrf -> csrf.disable()) // Disable CSRF protection
+				.authorizeHttpRequests(authorize -> authorize
+						.requestMatchers("/api/v1/**", "/error").permitAll() // Public endpoints
+						.requestMatchers("/api/v2/**").authenticated() // Secured endpoints
+				)
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless
+				)
+				.authenticationProvider(authenticationProvider()) // Custom AuthenticationProvider
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // JWT filter
 
 		return http.build();
 	}
+
 
 }

@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .metadata/
+uploads/
+gallery/
+.settings/
+.mvn/
 
 ### STS ###
 .apt_generated

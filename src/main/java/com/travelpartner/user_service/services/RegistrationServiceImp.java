@@ -2,6 +2,7 @@ package com.travelpartner.user_service.services;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,10 +20,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.RegistrationDAO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
+import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.kafka.UserEmailProducer;
 import com.travelpartner.user_service.utill.HtmlTemplate;
@@ -37,150 +40,199 @@ import jakarta.validation.Valid;
 @Service
 public class RegistrationServiceImp implements RegistrationService {
 
-	@Autowired
-	RegistrationDAO registrationDAO;
+    @Autowired
+    RegistrationDAO registrationDAO;
 
-	@Autowired
-	PasswordEncoder passwordEncoder;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
-	@Autowired
-	Utills utill;
+    @Autowired
+    Utills utill;
 
-	@Autowired
-	private AuthenticationManager authenticationManager;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider; // You can use JWT or sessions for handling authentication tokens
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider; // You can use JWT or sessions for handling authentication tokens
 
-	@Autowired
-	UserInfo userInfo;
+    @Autowired
+    UserInfo userInfo;
 
-	@Autowired
-	UserEmailProducer userEmailProducer;
-	
-	@Autowired
-	HtmlTemplate htmlTemplate;
+    @Autowired
+    UserEmailProducer userEmailProducer;
 
-	@Override
-	public ResponseEntity<?> createUserInfo(@Valid UserEntity userEntity, HttpServletRequest req,
-			HttpServletResponse res) {
-		// TODO Auto-generated method stub
-		Optional<UserEntity> existingUser = registrationDAO.isUserExists(userEntity.getEmail());
+    @Autowired
+    HtmlTemplate htmlTemplate;
 
-		if (existingUser.isPresent()) {
+    @Autowired
+    Utills utills;
 
-			String errorMessages = "User email already exists. Try with a different email.";
+    @Override
+    public ResponseEntity<?> createUserInfo(@Valid UserServiceDTO userServiceDTO, HttpServletRequest req,
+            HttpServletResponse res) {
+        try {
+            Optional<UserEntity> existingUser = registrationDAO.isUserExists(userServiceDTO.getEmail());
 
-			CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
-					HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            if (existingUser.isPresent()) {
 
-			// If the user exists, return a message with a bad status
+                String errorMessages = "User email already exists. Try with a different email.";
 
-			return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
-		}
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
 
-		String userName = userEntity.getUserName() != null ? userEntity.getUserName() : null;
+                // If the user exists, return a message with a bad status
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
 
-		String email = userEntity.getEmail() != null ? userEntity.getEmail() : null;
+            String userName = userServiceDTO.getUserName() != null ? userServiceDTO.getUserName() : null;
 
-		String role = "ROLE_USER,";
+            String email = userServiceDTO.getEmail() != null ? userServiceDTO.getEmail() : null;
 
-		String password = userEntity.getPassword() != null ? passwordEncoder.encode(userEntity.getPassword()) : null;
+            String role;
+            if (userServiceDTO.getIsAdmin() != null) {
+                role = "ROLE_ADMIN,";
+            } else {
+                role = "ROLE_USER,";
+            }
 
-		String uuid = utill.generateString(36);
+            String password = userServiceDTO.getPassword() != null
+                    ? passwordEncoder.encode(userServiceDTO.getPassword())
+                    : null;
 
-		LocalDateTime createdAt = LocalDateTime.now();
+            String uuid = utill.generateString(36);
 
-		String createdBy = uuid;
+            LocalDateTime createdAt = LocalDateTime.now();
 
-		UserEntity userDetails = new UserEntity(userName, email, role, password, uuid, createdAt, createdBy);
+            String createdBy = uuid;
 
-		UserEntity userInfo = registrationDAO.createUser(userDetails);
+            UserEntity userDetails = new UserEntity();
 
-		if (userInfo.getId() == null) {
+            userDetails.setUserName(userName);
+            userDetails.setEmail(email);
+            userDetails.setPassword(password);
+            userDetails.setRole(role);
+            userDetails.setUuid(uuid);
+            userDetails.setCreatedAt(createdAt);
+            userDetails.setCreatedBy(createdBy);
 
-			System.out.println("user not created!");
+            UserEntity userInfo = registrationDAO.createUser(userDetails);
 
-			String errorMessages = "User not created. Please try again!";
+            if (userInfo.getId() == null) {
 
-			CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
-					HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+                String errorMessages = "User not created. Please try again!";
 
-			// If the user exists, return a message with a bad status
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
 
-			return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
-		}
+                // If the user exists, return a message with a bad status
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
 
-		System.out.println("userInfo" + " " + userInfo);
-		
-		String subject = userInfo.getUserName() + " " + "you are invited to Travel-partner";
-		String content = htmlTemplate.InviteUser(userInfo.getId(),userInfo.getUserName());
-		
-		 // Create a map to store name and id
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("subject", subject);
-        userData.put("toEmailId", userInfo.getEmail());
-        userData.put("content", content);
+            String subject = userInfo.getUserName() + " " + "you are invited to Travel-partner";
+            String content = htmlTemplate.InviteUser(userInfo.getId(), userInfo.getUserName());
 
-		userEmailProducer.sendMessage(userData);
+            // Create a map to store name and id
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("subject", subject);
+            userData.put("toEmailId", userInfo.getEmail());
+            userData.put("content", content);
 
-		CustomResponse<UserEntity> responseBody = new CustomResponse<>(userInfo, "CREATED", HttpStatus.OK.value(),
-				req.getRequestURI(), LocalDateTime.now());
+            userEmailProducer.sendMessage(userData);
 
-		return new ResponseEntity<>(responseBody, HttpStatus.OK);
-	}
+            CustomResponse<UserEntity> responseBody = new CustomResponse<>(userInfo, "CREATED", HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
 
-	@Override
-	public ResponseEntity<?> athunticateUser(UserEntity userEntity, HttpServletRequest req, HttpServletResponse res) {
-		try {
-			UserDetails userDetails = userInfo.loadUserByUsername(userEntity.getEmail());
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            String stackTrace = utills.getStackTraceAsString(e);
 
-			System.out.println("userDetails" + " " + userDetails);
+            CustomResponse<String> responseBody = new CustomResponse<>(stackTrace, "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+    }
 
-			// Load the user by email
-			// Manually authenticate using the AuthenticationManager
-			Authentication authentication = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(userEntity.getEmail(), userEntity.getPassword()));
+    @Override
+    public ResponseEntity<?> athunticateUser(UserEntity userEntity, HttpServletRequest req, HttpServletResponse res) {
+        try {
+            UserDetails userDetails = userInfo.loadUserByUsername(userEntity.getEmail());
 
-			SecurityContextHolder.getContext().setAuthentication(authentication);
+            System.out.println("userDetails" + " " + userDetails);
 
-			// Optionally, generate a JWT token for the user (or manage sessions)
-			String token = jwtTokenProvider.generateToken(authentication);
-			
-			System.out.println("token"+" "+token);
+            // Load the user by email
+            // Manually authenticate using the AuthenticationManager
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userEntity.getEmail(), userEntity.getPassword()));
 
-			System.out.println("authentication" + " " + authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-			// Prepare user details for the response
-			UserInfoDTO user = (UserInfoDTO) authentication.getPrincipal();
-			Map<String, Object> response = new HashMap<>();
-			response.put("token", token);
-			response.put("id", user.getId()); // Assuming you have a getId() method
-			response.put("username", user.getUserName());
-			response.put("email", user.getEmail());
-			response.put("roles",
-					user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+            // Optionally, generate a JWT token for the user (or manage sessions)
+            String token = jwtTokenProvider.generateToken(authentication);
 
-			CustomResponse<?> responseBody = new CustomResponse<>(response, "SUCCESS", HttpStatus.OK.value(),
-					req.getRequestURI(), LocalDateTime.now());
+            System.out.println("token" + " " + token);
 
-			return new ResponseEntity<>(responseBody, HttpStatus.OK);
-		} catch (UsernameNotFoundException ex) {
-			// Handle case when user is not found
-			CustomResponse<String> responseBody = new CustomResponse<>("Invalid email or password", "BAD_CREDENTIALS",
-					HttpStatus.UNAUTHORIZED.value(), req.getRequestURI(), LocalDateTime.now());
-			return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
-		} catch (BadCredentialsException ex) {
-			// Handle case when credentials are invalid
-			CustomResponse<String> responseBody = new CustomResponse<>("Invalid email or password", "BAD_CREDENTIALS",
-					HttpStatus.UNAUTHORIZED.value(), req.getRequestURI(), LocalDateTime.now());
-			return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
-		} catch (Exception ex) {
-			// Handle any other exceptions
-			CustomResponse<String> responseBody = new CustomResponse<>("An error occurred", "ERROR",
-					HttpStatus.INTERNAL_SERVER_ERROR.value(), req.getRequestURI(), LocalDateTime.now());
-			return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
+            System.out.println("authentication" + " " + authentication);
+
+            // Prepare user details for the response
+            UserInfoDTO user = (UserInfoDTO) authentication.getPrincipal();
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("id", user.getId()); // Assuming you have a getId() method
+            response.put("username", user.getUserName());
+            response.put("email", user.getEmail());
+            response.put("roles",
+                    user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+
+            CustomResponse<?> responseBody = new CustomResponse<>(response, "SUCCESS", HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } catch (UsernameNotFoundException ex) {
+            // Handle case when user is not found
+            CustomResponse<String> responseBody = new CustomResponse<>("Invalid email or password", "BAD_CREDENTIALS",
+                    HttpStatus.UNAUTHORIZED.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
+        } catch (BadCredentialsException ex) {
+            // Handle case when credentials are invalid
+            CustomResponse<String> responseBody = new CustomResponse<>("Invalid email or password", "BAD_CREDENTIALS",
+                    HttpStatus.UNAUTHORIZED.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
+        } catch (Exception ex) {
+            // Handle any other exceptions
+            CustomResponse<String> responseBody = new CustomResponse<>(ex.getMessage(), "ERROR",
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> onBoardinguserInfo(HttpServletRequest req, HttpServletResponse res, String id) {
+        try {
+            System.out.println("id" + " " + id);
+
+            if (id.isBlank()) {
+
+                String errorMessages = "Id is required!";
+
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
+            UserEntity updateUser = registrationDAO.updateUserInfo(id);
+
+            CustomResponse<?> responseBody = new CustomResponse<>(updateUser, "UPDATED", HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+        } catch (Exception ex) {
+            // Handle any other exceptions
+            CustomResponse<String> responseBody = new CustomResponse<>(ex.getMessage(), "ERROR",
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }
