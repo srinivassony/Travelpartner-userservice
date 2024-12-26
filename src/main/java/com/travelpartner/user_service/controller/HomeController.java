@@ -39,7 +39,7 @@ public class HomeController {
     }
 
     @PostMapping("/user/upload/profilepic")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> uploadUserProfile(HttpServletRequest req,
             HttpServletResponse res, @RequestParam("file") MultipartFile file) {
         UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
