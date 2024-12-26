@@ -59,7 +59,9 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable()) // Disable CSRF protection
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers("/api/v1/**", "/error").permitAll() // Public endpoints
-						.requestMatchers("/api/v2/**").authenticated() // Secured endpoints
+						.requestMatchers("/api/v2/**").authenticated()
+						.requestMatchers("/api/v3/**").authenticated() // Secured endpoints
+
 				)
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless
 				)
@@ -68,6 +70,5 @@ public class SecurityConfig {
 
 		return http.build();
 	}
-
 
 }
