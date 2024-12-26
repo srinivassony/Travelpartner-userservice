@@ -11,6 +11,8 @@ import jakarta.validation.constraints.Size;
 
 public class UserServiceDTO {
 
+    private String id;
+
     @Size(min = 2, max = 30, message = "Username must be between 2 and 50 characters")
     private String userName;
 
@@ -40,6 +42,41 @@ public class UserServiceDTO {
     private String createdBy;
 
     private Boolean isAdmin;
+
+    private LocalDateTime updatedAt;
+
+    private String updatedBy;
+
+    public UserServiceDTO() {
+
+    }
+
+    public UserServiceDTO(String country, LocalDateTime createdAt, String createdBy, String dob, String email,
+            String gender, String id, String password, String phone, String role, String state,
+            LocalDateTime updatedAt, String updatedBy, String userName) {
+        this.country = country;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.dob = dob;
+        this.email = email;
+        this.gender = gender;
+        this.id = id;
+        this.password = password;
+        this.phone = phone;
+        this.role = role;
+        this.state = state;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
+        this.userName = userName;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getUserName() {
         return userName;
@@ -143,6 +180,22 @@ public class UserServiceDTO {
 
     public void setIsAdmin(Boolean isAdmin) {
         this.isAdmin = isAdmin;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
 }
