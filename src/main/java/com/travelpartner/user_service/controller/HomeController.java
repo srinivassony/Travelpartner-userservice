@@ -83,4 +83,15 @@ public class HomeController {
 
         return userService.uploadMultipleImages(req, res, userDetails, files);
     }
+
+    @GetMapping("/get/user/details")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> getUserDetailsById(HttpServletRequest req, HttpServletResponse res) {
+
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
+
+        return userService.getUserDetailsById(req, res, userDetails);
+
+    }
+
 }

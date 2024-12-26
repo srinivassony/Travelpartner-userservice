@@ -40,15 +40,15 @@ public class UserDAOImp implements UserDAO {
         return jpaUserRepo.findById(userDetails.getId())
                 .map(entity -> {
                     // Update other fields as needed
-                    if (userServiceDTO.getUserName() != null ) {
+                    if (userServiceDTO.getUserName() != null) {
                         entity.setPhone(userServiceDTO.getUserName());
                     }
 
-                    if (userServiceDTO.getEmail() != null ) {
+                    if (userServiceDTO.getEmail() != null) {
                         entity.setPhone(userServiceDTO.getEmail());
                     }
 
-                    if (userServiceDTO.getPhone() != null ) {
+                    if (userServiceDTO.getPhone() != null) {
                         entity.setPhone(userServiceDTO.getPhone());
                     }
 
@@ -88,8 +88,8 @@ public class UserDAOImp implements UserDAO {
 
     @Override
     public UserProfilePicDTO createProfilePic(UserProfilePicEntity userProfilePic) {
-        UserProfilePicEntity userProfilePicEntity =  userProfilePicRepo.save(userProfilePic);
-         return utillDTO.convertToUserProfileDTO(userProfilePicEntity);
+        UserProfilePicEntity userProfilePicEntity = userProfilePicRepo.save(userProfilePic);
+        return utillDTO.convertToUserProfileDTO(userProfilePicEntity);
     }
 
     @Override
@@ -107,8 +107,13 @@ public class UserDAOImp implements UserDAO {
 
     @Override
     public UserGalleryDTO createUserImages(UserGalleryEntity userGalleryEntity) {
-        UserGalleryEntity galleryEntity =  userGalleryRepo.save(userGalleryEntity);
+        UserGalleryEntity galleryEntity = userGalleryRepo.save(userGalleryEntity);
         return utillDTO.convertToUserGalleryDTO(galleryEntity);
     }
-}
 
+    @Override
+    public Optional<UserEntity> getUserInfoById(String id) {
+
+        return jpaUserRepo.findById(id);
+    }
+}
