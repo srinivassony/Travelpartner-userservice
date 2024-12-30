@@ -19,6 +19,8 @@ import com.travelpartner.user_service.repository.UserProfilePicRepo;
 import com.travelpartner.user_service.repository.UserRepository;
 import com.travelpartner.user_service.utill.UtillDTO;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class UserDAOImp implements UserDAO {
 
@@ -112,8 +114,11 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public Optional<UserEntity> getUserInfoById(String id) {
+    public UserServiceDTO getUserInfoById(String id) {
 
-        return jpaUserRepo.findById(id);
+        UserEntity userEntity = jpaUserRepo.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("User with ID " + id + " not found."));
+
+        return utillDTO.convertToUserDTO(userEntity);
     }
 }

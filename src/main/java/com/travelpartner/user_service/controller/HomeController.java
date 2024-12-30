@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dto.UserInfoDTO;
+import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.services.UserService;
 
@@ -84,7 +85,7 @@ public class HomeController {
         return userService.uploadMultipleImages(req, res, userDetails, files);
     }
 
-    @GetMapping("/get/user/details")
+    @GetMapping("/get/user/id")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> getUserDetailsById(HttpServletRequest req, HttpServletResponse res) {
 
@@ -94,4 +95,13 @@ public class HomeController {
 
     }
 
+    @PostMapping("/add/user/post")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> createUserPost(HttpServletRequest req,
+            HttpServletResponse res, @RequestBody UserPostDTO userPostDTO) {
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
+        System.out.println(userDetails.getUuid());
+
+        return userService.createUserPost(req, res, userPostDTO);
+    }
 }

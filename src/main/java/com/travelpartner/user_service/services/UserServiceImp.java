@@ -21,6 +21,7 @@ import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.UserDAO;
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
+import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
@@ -269,10 +270,11 @@ public class UserServiceImp implements UserService {
             UserInfoDTO userDetails) {
 
         try {
+            System.out.println("82222222" + " " + userDetails.getId());
 
-            Optional<UserEntity> getUserDetails = userDAO.getUserInfoById(userDetails.getId());
+            UserServiceDTO getUserDetails = userDAO.getUserInfoById(userDetails.getId());
 
-            if (getUserDetails.isEmpty()) {
+            if (getUserDetails.getId() == null) {
 
                 String errorMessages = "User deatils not found!";
 
@@ -297,6 +299,13 @@ public class UserServiceImp implements UserService {
                     HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
+
+    }
+
+    @Override
+    public ResponseEntity<?> createUserPost(HttpServletRequest req, HttpServletResponse res, UserPostDTO userPostDTO) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createUserPost'");
     }
 
 }
