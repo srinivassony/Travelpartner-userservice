@@ -1,11 +1,9 @@
 package com.travelpartner.user_service.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,12 +12,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tp_post")
-public class UserPostEntity {
+@Table(name = "tp_post_images")
+public class UserPostImageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,8 +26,11 @@ public class UserPostEntity {
     @Column(name = "LOCATION", nullable = false)
     private String location;
 
-    @Column(name = "DESCRIPTION", nullable = false)
-    private String description;
+    @Column(name = "POST_FILENAME", nullable = false)
+    private String postFileName;
+
+    @Column(name = "POST_FILEID", nullable = false)
+    private String postFileId;
 
     @Column(name = "CREATED_AT")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -47,11 +47,8 @@ public class UserPostEntity {
     private String updatedBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID", referencedColumnName = "id", nullable = false)
-    private UserEntity userPost;
-
-    @OneToMany(mappedBy = "userPostImages", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<UserPostImageEntity> userPostImageEntities;
+	@JoinColumn(name = "POST_ID", referencedColumnName = "id", nullable = false)
+	private UserPostEntity userPostImages;
 
     public String getId() {
         return id;
@@ -69,12 +66,20 @@ public class UserPostEntity {
         this.location = location;
     }
 
-    public String getDescription() {
-        return description;
+    public String getPostFileName() {
+        return postFileName;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setPostFileName(String postFileName) {
+        this.postFileName = postFileName;
+    }
+
+    public String getPostFileId() {
+        return postFileId;
+    }
+
+    public void setPostFileId(String postFileId) {
+        this.postFileId = postFileId;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -109,13 +114,12 @@ public class UserPostEntity {
         this.updatedBy = updatedBy;
     }
 
-    public UserEntity getUserPost() {
-        return userPost;
+    public UserPostEntity getUserPostImages() {
+        return userPostImages;
     }
 
-    public void setUserPost(UserEntity userPost) {
-        this.userPost = userPost;
+    public void setUserPostImages(UserPostEntity userPostImages) {
+        this.userPostImages = userPostImages;
     }
 
-    
 }
