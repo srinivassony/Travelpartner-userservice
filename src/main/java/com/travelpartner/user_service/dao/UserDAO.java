@@ -25,5 +25,5 @@ public interface UserDAO {
 
     UserGalleryDTO createUserImages(UserGalleryEntity userGalleryEntity);
 
-    Optional<UserEntity> getUserInfoById(String id);
+    UserServiceDTO getUserInfoById(String id);
 }

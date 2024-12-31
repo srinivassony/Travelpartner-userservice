@@ -114,12 +114,12 @@ public class AdminServiceImp implements AdminService {
     }
 
     public static ByteArrayInputStream generateUserExcel(List<UserServiceDTO> users) throws IOException {
-        String[] columns = { "ID", "Username", "Email", "Phone", "Role", "Created At" };
-
-        try (
-                Workbook workbook = new XSSFWorkbook();
-                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try {
+            Workbook workbook = new XSSFWorkbook();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
             Sheet sheet = workbook.createSheet("Users");
+
+            String[] columns = { "Username", "Email", "Phone", "Role", "Created At" };
 
             // Header row
             Row headerRow = sheet.createRow(0);
@@ -133,12 +133,11 @@ public class AdminServiceImp implements AdminService {
             int rowIdx = 1;
             for (UserServiceDTO user : users) {
                 Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(user.getId());
-                row.createCell(1).setCellValue(user.getUserName());
-                row.createCell(2).setCellValue(user.getEmail());
-                row.createCell(3).setCellValue(user.getPhone());
-                row.createCell(4).setCellValue(user.getRole());
-                row.createCell(5).setCellValue(user.getCreatedAt().toString());
+                row.createCell(0).setCellValue(user.getUserName());
+                row.createCell(1).setCellValue(user.getEmail());
+                row.createCell(2).setCellValue(user.getPhone());
+                row.createCell(3).setCellValue(user.getRole());
+                row.createCell(4).setCellValue(user.getCreatedAt().toString());
             }
 
             // Auto-size columns
@@ -148,6 +147,10 @@ public class AdminServiceImp implements AdminService {
 
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
+        } catch (Exception e) {
+            // Log the error and rethrow a custom exception for better debugging
+            e.printStackTrace();
+            throw new RuntimeException("Failed to generate Excel file: " + e.getMessage());
         }
     }
 
