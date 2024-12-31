@@ -285,7 +285,7 @@ public class UserServiceImp implements UserService {
 
             }
 
-            CustomResponse<?> responseBody = new CustomResponse<>(getUserDetails, "UPDATED",
+            CustomResponse<?> responseBody = new CustomResponse<>(getUserDetails, "OK",
                     HttpStatus.OK.value(),
                     req.getRequestURI(), LocalDateTime.now());
 
