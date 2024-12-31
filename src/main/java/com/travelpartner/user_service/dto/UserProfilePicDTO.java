@@ -43,6 +43,13 @@ public class UserProfilePicDTO {
         this.userId = userId;
     }
 
+    public UserProfilePicDTO(String profilePicId2, String profilePicName2, String path2,String userId) {
+        this.profilePicId = profilePicId2;
+        this.profilePicName = profilePicName2;
+        this.path = path2;
+        this.userId = userId;
+    }
+
     public String getId() {
         return id;
     }

@@ -1,5 +1,6 @@
 package com.travelpartner.user_service.utill;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,34 @@ public class UtillDTO {
     }
 
     public UserServiceDTO convertToUserDTO(UserEntity entity) {
+        System.out.println("entity"+" "+entity.getId());
+        UserProfilePicDTO userProfilePicDTO = null;
+        List<UserGalleryDTO> userGalleryDTOList = new ArrayList<>();
+
+        if (entity.getProfilePic() != null) {
+            UserProfilePicEntity userProfilePic = entity.getProfilePic();
+            userProfilePicDTO = new UserProfilePicDTO(
+                userProfilePic.getProfilePicId(),
+                userProfilePic.getProfilePicName(),
+                userProfilePic.getPath(),
+                userProfilePic.getUser().getId()
+            );
+        }
+
+        if (entity.getGalleryEntities() != null && !entity.getGalleryEntities().isEmpty()) {
+            List<UserGalleryEntity> userGalleryList = entity.getGalleryEntities();
+
+            for (UserGalleryEntity userGallery : userGalleryList) {
+                UserGalleryDTO userGalleryDTOInfo = new UserGalleryDTO(
+                        userGallery.getId(),
+                        userGallery.getImageId(),
+                        userGallery.getFileName(),
+                        userGallery.getUserGallery().getId()
+                       );
+                       userGalleryDTOList.add(userGalleryDTOInfo);
+            }
+        }
+
         return new UserServiceDTO(
                 entity.getCountry(),
                 entity.getCreatedAt(),
@@ -49,14 +78,15 @@ public class UtillDTO {
                 entity.getEmail(),
                 entity.getGender(),
                 entity.getId(),
-                entity.getPassword(),
+                entity.getUuid(),
                 entity.getPhone(),
                 entity.getRole(),
                 entity.getState(),
                 entity.getUpdatedAt(),
                 entity.getUpdatedBy(),
-                entity.getUserName());
-
+                entity.getUserName(),
+                userProfilePicDTO,
+                userGalleryDTOList);
     }
 
     public List<UserServiceDTO> convertToUsersDTOList(List<UserEntity> userEntities) {
@@ -69,7 +99,7 @@ public class UtillDTO {
                         userEntity.getEmail(),
                         userEntity.getGender(),
                         userEntity.getId(),
-                        userEntity.getPassword(),
+                        userEntity.getUuid(),
                         userEntity.getPhone(),
                         userEntity.getRole(),
                         userEntity.getState(),
