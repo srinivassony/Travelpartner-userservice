@@ -43,6 +43,10 @@ public class UserGalleryDTO {
         this.userId = userId2;
     }
 
+    public UserGalleryDTO() {
+       
+    }
+
     public String getId() {
         return id;
     }

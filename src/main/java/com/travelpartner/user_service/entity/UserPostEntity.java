@@ -53,6 +53,9 @@ public class UserPostEntity {
     @OneToMany(mappedBy = "userPostImages", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserPostImageEntity> userPostImageEntities;
 
+    public UserPostEntity() {
+    }
+
     public String getId() {
         return id;
     }
@@ -116,6 +119,4 @@ public class UserPostEntity {
     public void setUserPost(UserEntity userPost) {
         this.userPost = userPost;
     }
-
-    
 }
