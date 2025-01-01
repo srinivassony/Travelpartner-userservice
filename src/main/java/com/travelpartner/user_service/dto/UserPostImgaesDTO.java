@@ -5,14 +5,16 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.travelpartner.user_service.entity.UserPostEntity;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class UserPostImgaesDTO {
 
     private String id;
 
-    private String location;
-
+    @NotBlank(message="File Name is required")
     private String postFileName;
 
+    @NotBlank(message="File id is required")
     private String postFileId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -33,14 +35,6 @@ public class UserPostImgaesDTO {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public String getPostFileName() {

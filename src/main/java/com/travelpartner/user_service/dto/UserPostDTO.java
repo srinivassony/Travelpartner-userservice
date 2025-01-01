@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 
 import com.travelpartner.user_service.entity.UserEntity;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class UserPostDTO {
 
-    // @NotBlank(name="")
+    @NotBlank(message="Location is required")
     private String location;
 
+    @NotBlank(message="Description is required")
     private String description;
 
     private LocalDateTime createdAt;
