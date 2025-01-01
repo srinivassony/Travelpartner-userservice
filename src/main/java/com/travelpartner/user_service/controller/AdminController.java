@@ -96,15 +96,6 @@ public class AdminController {
         return adminService.deleteUser(req, res, id);
     }
 
-    // @GetMapping("/get/users")
-    // @PreAuthorize("hasRole('ROLE_ADMIN')")
-    // public ResponseEntity<?> getUsersWithPagination(HttpServletRequest req,
-    // HttpServletResponse res,
-    // @RequestParam int page, @RequestParam int size) {
-
-    // return adminService.getUsersWithPagination(req, res, page, size);
-    // }
-
     // @PostMapping("/upload/bluck/users")
     // @PreAuthorize("hasRole('ROLE_ADMIN')")
     // public ResponseEntity<?> uploadUserData(HttpServletRequest req,
@@ -113,4 +104,14 @@ public class AdminController {
 
     // return adminService.uploadUsersData(req, res, file);
     // }
+
+    @PostMapping("/upload/bulk/users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> uploadUserData(HttpServletRequest req, HttpServletResponse res,
+            @RequestParam("file") MultipartFile file) {
+        System.out.println("File upload endpoint hit");
+
+        return adminService.uploadUsersData(req, res, file);
+    }
+
 }

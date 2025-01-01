@@ -23,6 +23,9 @@ public interface AdminService {
 
     ResponseEntity<?> deleteUser(HttpServletRequest req, HttpServletResponse res, String id);
 
+    ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse res, MultipartFile file);
+
+
     // ResponseEntity<?> getUsersWithPagination(HttpServletRequest req,
     // HttpServletResponse res, int page, int size);
 
