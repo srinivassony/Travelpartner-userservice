@@ -3,11 +3,13 @@ package com.travelpartner.user_service.services;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.AdminDAO;
@@ -236,162 +239,331 @@ public class AdminServiceImp implements AdminService {
 
     }
 
-    // @Override
-    // public ResponseEntity<?> uploadUsersData(HttpServletRequest req,
-    // HttpServletResponse res, MultipartFile file) {
-    // // TODO Auto-generated method stub
-    // try {
+    @Override
+    public ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse res, MultipartFile file) {
 
-    // InputStream inputStream = file.getInputStream();
-    // Workbook workbook = WorkbookFactory.create(inputStream);
-    // // XSSFSheet sheetName = (XSSFSheet) workbook.getSheet("USER");
-    // Sheet sheet = workbook.getSheetAt(0); // Get the first sheet
-    // Iterator<Row> rowIterator = sheet.iterator();
+        try {
+            if (file.isEmpty()) {
 
-    // List<UserEntity> excelData = new ArrayList<>();
+                String errorMessage = "File is Empty !";
 
-    // // Iterate over the rows and process each row
-    // while (rowIterator.hasNext()) {
-    // Row row = rowIterator.next();
-    // // Skip header row (if any)
-    // if (row.getRowNum() == 0)
-    // continue;
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessage, "NOT_FOUND",
+                        HttpStatus.NOT_FOUND.value(), req.getRequestURI(), LocalDateTime.now());
 
-    // // Read the columns, handle missing values
-    // String name = getStringCellValue(row, 0); // First column
-    // String email = getStringCellValue(row, 1); // Second column
-    // if (email == null || email.isEmpty()) {
+                return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
 
-    // String errorMessage = "Email is requred for user registration";
+            }
 
-    // CustomResponse<String> responseBody = new CustomResponse<>(errorMessage,
-    // "NOT_FOUND",
-    // HttpStatus.NOT_FOUND.value(), req.getRequestURI(), LocalDateTime.now());
+            List<UserEntity> users = new ArrayList<>();
+            try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+                Sheet sheet = workbook.getSheetAt(0);
+                Row headerRow = sheet.getRow(0);
 
-    // return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
-    // }
-    // String phone = getStringCellValue(row, 2); // Third column
-    // String role = getStringCellValue(row, 3); // Fourth column
-    // String password = getStringCellValue(row, 4); // Assuming 5th column for
-    // password (you can modify as
-    // // needed)
-    // if (password == null || password.isEmpty()) {
-    // password = "123"; // Default password
-    // }
+                validateHeaders(headerRow);
 
-    // String country = getStringCellValue(row, 5); // Sixth column
-    // if (country == null || country.isEmpty()) {
-    // country = "India"; // Default country
-    // }
+                System.out.println(sheet.getLastRowNum());
 
-    // String uuid = UUID.randomUUID().toString();
+                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                    Row row = sheet.getRow(i);
+                    UserEntity user = validateAndParseRow(row);
+                    users.add(user);
+                }
+            }
 
-    // excelData.addAll(uploadedUserData);
+            // List<UserEntity> userList = adminDAO.uploadUserInfo(users);
 
-    // }
+            List<UserEntity> userList = adminDAO.uploadUserInfo(users);
 
-    // List<UserEntity> uploadedUserData = adminDAO.uploadUserData(excelData);
+            CustomResponse<?> responseBody = new CustomResponse<>(userList, "SUCCESS",
+                    HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
 
-    // workbook.close();
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
 
-    // CustomResponse<List<UserEntity>> responseBody = new
-    // CustomResponse<>(excelData, "SUCCESS",
-    // HttpStatus.OK.value(), req.getRequestURI(), LocalDateTime.now());
+        } catch (Exception e) {
+            String stackTrace = utills.getStackTraceAsString(e);
 
-    // // Close the workbook after use
+            CustomResponse<String> responseBody = new CustomResponse<>(stackTrace,
+                    "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+    }
 
-    // return new ResponseEntity<>(responseBody, HttpStatus.OK);
+    private void validateHeaders(Row headerRow) {
+        List<String> requiredHeaders = List.of("username", "email", "phone", "country", "state", "dob");
+        for (int i = 0; i < requiredHeaders.size(); i++) {
+            Cell cell = headerRow.getCell(i);
+            if (cell == null || !requiredHeaders.get(i).equalsIgnoreCase(cell.getStringCellValue().trim())) {
+                throw new IllegalArgumentException("Invalid column name: " + requiredHeaders.get(i));
+            }
+        }
+    }
 
-    // } catch (Exception e) {
+    private UserEntity validateAndParseRow(Row row) {
+        UserEntity user = new UserEntity();
 
-    // String stackTrace = utills.getStackTraceAsString(e);
+        // Assuming the expected columns are in specific positions (adjust as needed)
+        // For example, column 0 is "username", column 1 is "email", etc.
 
-    // CustomResponse<String> responseBody = new CustomResponse<>(stackTrace,
-    // "BAD_REQUEST",
-    // HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
-    // return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        user.setUuid(UUID.randomUUID().toString());
+        // Read "username" (column 0)
+        Cell usernameCell = row.getCell(0);
+        if (usernameCell != null && usernameCell.getCellType() == CellType.STRING) {
+            user.setUserName(usernameCell.getStringCellValue().trim());
 
-    // }
-    // }
+            // if (existingUserNames.contains(userName)) {
+            // throw new IllegalArgumentException("Duplicate username found: " + userName);
+            // }
+            // user.setUserName(userName);
+            // existingUserNames.add(userName);
+        } else {
+            // Handle error if the value is not a string or is empty
+            throw new IllegalArgumentException("Please enter the field username");
+        }
 
-    // private String getStringCellValue(Row row, int cellIndex) {
-    // // Get the cell at the specified index from the row
-    // Cell cell = row.getCell(cellIndex);
+        // Read "email" (column 1)
+        Cell emailCell = row.getCell(1);
+        if (emailCell != null && emailCell.getCellType() == CellType.STRING) {
+            user.setEmail(emailCell.getStringCellValue().trim());
+            // if (existingEmails.contains(email)) {
+            // throw new IllegalArgumentException("Duplicate email found: " + email);
+            // }
+            // user.setEmail(email);
+            // existingEmails.add(email);
+        } else {
+            throw new IllegalArgumentException("Please enter the field email");
+        }
 
-    // // Check if the cell is not null and contains a string
-    // if (cell != null && cell.getCellType() == CellType.STRING) {
-    // return cell.getStringCellValue(); // Return the string value of the cell
-    // }
+        // Read "phone" (column 2)
+        Cell phoneCell = row.getCell(2);
+        if (phoneCell != null) {
+            if (phoneCell.getCellType() == CellType.STRING) {
+                user.setPhone(phoneCell.getStringCellValue().trim()); // If phone is already a string
+            } else if (phoneCell.getCellType() == CellType.NUMERIC) {
+                // If phone is stored as a numeric value (e.g., 1234567890), convert it to a
+                // string
+                user.setPhone(String.valueOf((long) phoneCell.getNumericCellValue())); // Convert numeric value to
+                                                                                       // string
+            } else {
+                throw new IllegalArgumentException("Please enter the field phone");
+            }
+        } else {
+            throw new IllegalArgumentException("Please enter the field phone");
+        }
+        // Read "country" (column 3)
+        Cell countryCell = row.getCell(3);
+        if (countryCell != null && countryCell.getCellType() == CellType.STRING) {
+            user.setCountry(countryCell.getStringCellValue().trim());
+        } else {
+            throw new IllegalArgumentException("Please enter the field country");
+        }
 
-    // // If cell is null or not a string, return an empty string
-    // return "";
-    // }
+        // Read "state" (column 4)
+        Cell stateCell = row.getCell(4);
+        if (stateCell != null && stateCell.getCellType() == CellType.STRING) {
+            user.setState(stateCell.getStringCellValue().trim());
+        } else {
+            throw new IllegalArgumentException("Please enter the field state");
+        }
 
-    // public ResponseEntity<?> uploadUsersData(HttpServletRequest req,
-    // HttpServletResponse res, MultipartFile file,
-    // UserEntity userEntity) {
+        // Read "dob" (column 5), assuming it's a date (you can adjust for other
+        // formats)
+        Cell dobCell = row.getCell(5);
+        if (dobCell != null) {
+            if (dobCell.getCellType() == CellType.STRING) {
+                user.setDob(dobCell.getStringCellValue().trim()); // If already in string format
+            } else if (dobCell.getCellType() == CellType.NUMERIC) {
+                if (org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(dobCell)) {
+                    // Convert date to string in desired format
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    user.setDob(sdf.format(dobCell.getDateCellValue())); // Convert date to string
+                } else {
+                    throw new IllegalArgumentException("Please enter the field dob");
+                }
+            } else {
+                throw new IllegalArgumentException("Please enter the field dob");
+            }
+        } else {
+            throw new IllegalArgumentException("Please enter the field dob");
+        }
+        user.setRole("ROLE_USER,");
 
-    // try {
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            user.setPassword(generateRandomPassword()); // Set a random password if it's not provided
+        }
+        return user;
+    }
 
-    // // List<List<String>> rows = new ArrayList<>();
+    public String generateRandomPassword() {
+        int length = 6; // You can change the length as needed
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_+=";
+        StringBuilder password = new StringBuilder();
+        Random random = new Random();
 
-    // // Workbook workbook = WorkbookFactory.create(file.getInputStream());
-    // // Sheet sheet = workbook.getSheetAt(0);
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(characters.length());
+            password.append(characters.charAt(index));
+        }
 
-    // // rows = StreamSupport.stream(sheet.spliterator(), false)
-    // // .map(row -> StreamSupport
-    // // .stream(row.spliterator(), false)
-    // // .map(this::getCellStringValue)
-    // // .collect(Collectors.toList()))
-    // // .collect(Collectors.toList());
+        return password.toString();
 
-    // // List<UserEntity> excelDataList = rows.stream().map(row -> {
-    // // UserEntity excelData = new UserEntity();
-    // // excelData.setUserName(row.get(0));
-    // // excelData.setEmail(row.get(1));
-    // // excelData.setPassword(row.get(2));
-    // // return excelData;
-    // // }).collect(Collectors.toList());
-    // // jpaUserRep.saveAll(excelDataList);
-
-    // if (file.isEmpty()) {
-    // return ResponseEntity.badRequest().body("File is empty. Please upload a valid
-    // Excel file.");
-    // }
-    // if (!file.getOriginalFilename().endsWith(".xlsx")) {
-    // return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-    // .body("Invalid file format. Please upload an Excel file.");
-    // }
-
-    // Workbook workbook = WorkbookFactory.create(file.getInputStream());
-    // Sheet sheet = workbook.getSheetAt(0); // Assume data is in the first sheet
-
-    // // for (Row row : sheet) {
-    // // if (row.getRowNum() == 0) {
-    // // // Skip the header row
-    // // continue;
-    // // }
-    // // }
-
-    // UserEntity excelData = adminDAO.uploadUserInfo(sheet, userEntity);
-
-    // CustomResponse<?> responseBody = new CustomResponse<>(excelData, "SUCCESS",
-    // HttpStatus.OK.value(),
-    // req.getRequestURI(), LocalDateTime.now());
-
-    // return new ResponseEntity<>(responseBody, HttpStatus.OK);
-
-    // } catch (Exception e) {
-
-    // String stackTrace = utills.getStackTraceAsString(e);
-
-    // CustomResponse<String> responseBody = new CustomResponse<>(stackTrace,
-    // "BAD_REQUEST",
-    // HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
-    // return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
-
-    // }
-
-    // }
-
+    }
 }
+// @Override
+// public ResponseEntity<?> uploadUsersData(HttpServletRequest req,
+// HttpServletResponse res, MultipartFile file) {
+// // TODO Auto-generated method stub
+// try {
+
+// InputStream inputStream = file.getInputStream();
+// Workbook workbook = WorkbookFactory.create(inputStream);
+// // XSSFSheet sheetName = (XSSFSheet) workbook.getSheet("USER");
+// Sheet sheet = workbook.getSheetAt(0); // Get the first sheet
+// Iterator<Row> rowIterator = sheet.iterator();
+
+// List<UserEntity> excelData = new ArrayList<>();
+
+// // Iterate over the rows and process each row
+// while (rowIterator.hasNext()) {
+// Row row = rowIterator.next();
+// // Skip header row (if any)
+// if (row.getRowNum() == 0)
+// continue;
+
+// // Read the columns, handle missing values
+// String name = getStringCellValue(row, 0); // First column
+// String email = getStringCellValue(row, 1); // Second column
+// if (email == null || email.isEmpty()) {
+
+// String errorMessage = "Email is requred for user registration";
+
+// CustomResponse<String> responseBody = new CustomResponse<>(errorMessage,
+// "NOT_FOUND",
+// HttpStatus.NOT_FOUND.value(), req.getRequestURI(), LocalDateTime.now());
+
+// return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
+// }
+// String phone = getStringCellValue(row, 2); // Third column
+// String role = getStringCellValue(row, 3); // Fourth column
+// String password = getStringCellValue(row, 4); // Assuming 5th column for
+// password (you can modify as
+// // needed)
+// if (password == null || password.isEmpty()) {
+// password = "123"; // Default password
+// }
+
+// String country = getStringCellValue(row, 5); // Sixth column
+// if (country == null || country.isEmpty()) {
+// country = "India"; // Default country
+// }
+
+// String uuid = UUID.randomUUID().toString();
+
+// excelData.addAll(uploadedUserData);
+
+// }
+
+// List<UserEntity> uploadedUserData = adminDAO.uploadUserData(excelData);
+
+// workbook.close();
+
+// CustomResponse<List<UserEntity>> responseBody = new
+// CustomResponse<>(excelData, "SUCCESS",
+// HttpStatus.OK.value(), req.getRequestURI(), LocalDateTime.now());
+
+// // Close the workbook after use
+
+// return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+// } catch (Exception e) {
+
+// String stackTrace = utills.getStackTraceAsString(e);
+
+// CustomResponse<String> responseBody = new CustomResponse<>(stackTrace,
+// "BAD_REQUEST",
+// HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+// return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+
+// }
+// }
+
+// private String getStringCellValue(Row row, int cellIndex) {
+// // Get the cell at the specified index from the row
+// Cell cell = row.getCell(cellIndex);
+
+// // Check if the cell is not null and contains a string
+// if (cell != null && cell.getCellType() == CellType.STRING) {
+// return cell.getStringCellValue(); // Return the string value of the cell
+// }
+
+// // If cell is null or not a string, return an empty string
+// return "";
+// }
+
+// public ResponseEntity<?> uploadUsersData(HttpServletRequest req,
+// HttpServletResponse res, MultipartFile file,
+// UserEntity userEntity) {
+
+// try {
+
+// // List<List<String>> rows = new ArrayList<>();
+
+// // Workbook workbook = WorkbookFactory.create(file.getInputStream());
+// // Sheet sheet = workbook.getSheetAt(0);
+
+// // rows = StreamSupport.stream(sheet.spliterator(), false)
+// // .map(row -> StreamSupport
+// // .stream(row.spliterator(), false)
+// // .map(this::getCellStringValue)
+// // .collect(Collectors.toList()))
+// // .collect(Collectors.toList());
+
+// // List<UserEntity> excelDataList = rows.stream().map(row -> {
+// // UserEntity excelData = new UserEntity();
+// // excelData.setUserName(row.get(0));
+// // excelData.setEmail(row.get(1));
+// // excelData.setPassword(row.get(2));
+// // return excelData;
+// // }).collect(Collectors.toList());
+// // jpaUserRep.saveAll(excelDataList);
+
+// if (file.isEmpty()) {
+// return ResponseEntity.badRequest().body("File is empty. Please upload a valid
+// Excel file.");
+// }
+// if (!file.getOriginalFilename().endsWith(".xlsx")) {
+// return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+// .body("Invalid file format. Please upload an Excel file.");
+// }
+
+// Workbook workbook = WorkbookFactory.create(file.getInputStream());
+// Sheet sheet = workbook.getSheetAt(0); // Assume data is in the first sheet
+
+// // for (Row row : sheet) {
+// // if (row.getRowNum() == 0) {
+// // // Skip the header row
+// // continue;
+// // }
+// // }
+
+// UserEntity excelData = adminDAO.uploadUserInfo(sheet, userEntity);
+
+// CustomResponse<?> responseBody = new CustomResponse<>(excelData, "SUCCESS",
+// HttpStatus.OK.value(),
+// req.getRequestURI(), LocalDateTime.now());
+
+// return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+// } catch (Exception e) {
+
+// String stackTrace = utills.getStackTraceAsString(e);
+
+// CustomResponse<String> responseBody = new CustomResponse<>(stackTrace,
+// "BAD_REQUEST",
+// HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+// return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+
+// }
+
+// }
