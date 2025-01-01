@@ -250,7 +250,7 @@ public class UserServiceImp implements UserService {
 
             List<UserGalleryDTO> createUserGallery = userDAO.createUserImages(userGalleryDetails);
 
-            CustomResponse<?> responseBody = new CustomResponse<>(createUserGallery, "UPDATED",
+            CustomResponse<?> responseBody = new CustomResponse<>(createUserGallery, "SUCCESS",
                     HttpStatus.OK.value(),
                     req.getRequestURI(), LocalDateTime.now());
 
