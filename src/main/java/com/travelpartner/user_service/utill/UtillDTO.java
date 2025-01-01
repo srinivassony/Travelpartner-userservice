@@ -7,10 +7,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.travelpartner.user_service.dto.UserGalleryDTO;
+import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
+import com.travelpartner.user_service.entity.UserPostEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
 
 @Component
@@ -29,8 +31,9 @@ public class UtillDTO {
                 entity.getUser().getId());
     }
 
-    public UserGalleryDTO convertToUserGalleryDTO(UserGalleryEntity entity) {
-        return new UserGalleryDTO(
+    public List<UserGalleryDTO> convertToUsersGalleryListDTO(List<UserGalleryEntity> userGalleryEntites) {
+        return userGalleryEntites.stream()
+        .map(entity -> new UserGalleryDTO(
                 entity.getId(),
                 entity.getImageId(),
                 entity.getFileName(),
@@ -38,7 +41,7 @@ public class UtillDTO {
                 entity.getCreatedBy(),
                 entity.getUpdatedAt(),
                 entity.getUpdatedBy(),
-                entity.getUserGallery().getId());
+                entity.getUserGallery().getId())).toList();
     }
 
     public UserServiceDTO convertToUserDTO(UserEntity entity) {
@@ -107,6 +110,19 @@ public class UtillDTO {
                         userEntity.getUpdatedBy(),
                         userEntity.getUserName()))
                 .collect(Collectors.toList());
+    }
+
+
+    public UserPostDTO convertToUserPostDTO(UserPostEntity entity) {
+        return new UserPostDTO(
+                entity.getId(),
+                entity.getLocation(),
+                entity.getDescription(),
+                entity.getCreatedAt(),
+                entity.getCreatedBy(),
+                entity.getUpdatedAt(),
+                entity.getUpdatedBy(),
+                entity.getUserPost().getId());
     }
 
 }

@@ -4,11 +4,16 @@ import java.time.LocalDateTime;
 
 import com.travelpartner.user_service.entity.UserEntity;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class UserPostDTO {
 
-    // @NotBlank(name="")
+    private String id;
+    
+    @NotBlank(message="Location is required")
     private String location;
 
+    @NotBlank(message="Description is required")
     private String description;
 
     private LocalDateTime createdAt;
@@ -22,6 +27,21 @@ public class UserPostDTO {
     private UserEntity userPost;
 
     private String userId;
+
+    public UserPostDTO() {
+    }
+
+    public UserPostDTO(String id, String location, String description, LocalDateTime createdAt, String createdBy,
+            LocalDateTime updatedAt, String updatedBy, String userId) {
+        this.id = id;
+        this.location = location;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.updatedAt=updatedAt;
+        this.updatedBy=updatedBy;
+        this.userId = userId;
+    }
 
     public String getLocation() {
         return location;
@@ -85,6 +105,16 @@ public class UserPostDTO {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+
+    public String getId() {
+        return id;
+    }
+
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     

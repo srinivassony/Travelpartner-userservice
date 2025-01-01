@@ -23,9 +23,6 @@ public class UserPostImageEntity {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "LOCATION", nullable = false)
-    private String location;
-
     @Column(name = "POST_FILENAME", nullable = false)
     private String postFileName;
 
@@ -56,14 +53,6 @@ public class UserPostImageEntity {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public String getPostFileName() {

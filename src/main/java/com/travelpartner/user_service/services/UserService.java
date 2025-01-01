@@ -23,6 +23,6 @@ public interface UserService {
 
     ResponseEntity<?> getUserDetailsById(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails);
 
-    ResponseEntity<?> createUserPost(HttpServletRequest req, HttpServletResponse res, UserPostDTO userPostDTO);
+    ResponseEntity<?> createUserPost(HttpServletRequest req, HttpServletResponse res, UserPostDTO userPostDTO, UserInfoDTO userDetails);
 
 }

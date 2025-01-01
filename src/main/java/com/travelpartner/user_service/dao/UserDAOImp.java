@@ -1,6 +1,7 @@
 package com.travelpartner.user_service.dao;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,15 @@ import org.springframework.stereotype.Service;
 
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
+import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
+import com.travelpartner.user_service.entity.UserPostEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
 import com.travelpartner.user_service.repository.UserGalleryRepo;
+import com.travelpartner.user_service.repository.UserPostRepo;
 import com.travelpartner.user_service.repository.UserProfilePicRepo;
 import com.travelpartner.user_service.repository.UserRepository;
 import com.travelpartner.user_service.utill.UtillDTO;
@@ -32,6 +36,9 @@ public class UserDAOImp implements UserDAO {
 
     @Autowired
     UserGalleryRepo userGalleryRepo;
+
+    @Autowired
+    UserPostRepo userPostRepo;
 
     @Autowired
     UtillDTO utillDTO;
@@ -108,9 +115,9 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public UserGalleryDTO createUserImages(UserGalleryEntity userGalleryEntity) {
-        UserGalleryEntity galleryEntity = userGalleryRepo.save(userGalleryEntity);
-        return utillDTO.convertToUserGalleryDTO(galleryEntity);
+    public List<UserGalleryDTO> createUserImages(List<UserGalleryEntity> userGalleryDetails) {
+        List<UserGalleryEntity> galleryEntity = userGalleryRepo.saveAll(userGalleryDetails);
+        return utillDTO.convertToUsersGalleryListDTO(galleryEntity);
     }
 
     @Override
@@ -121,4 +128,11 @@ public class UserDAOImp implements UserDAO {
 
         return utillDTO.convertToUserDTO(userEntity);
     }
+
+    @Override
+    public UserPostDTO createUserPost(UserPostEntity setUserPost) {
+        UserPostEntity userPostEntity = userPostRepo.save(setUserPost);
+        return utillDTO.convertToUserPostDTO(userPostEntity);
+    }
+
 }
