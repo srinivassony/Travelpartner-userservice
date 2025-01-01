@@ -27,4 +27,6 @@ public interface AdminDAO {
 
     Optional<UserEntity> getUserInfoById(String id);
 
+    List<UserEntity> uploadUserInfo(List<UserEntity> users);
+
 }
