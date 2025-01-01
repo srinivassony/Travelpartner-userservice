@@ -155,6 +155,26 @@ public class RegistrationServiceImp implements RegistrationService {
     @Override
     public ResponseEntity<?> athunticateUser(UserEntity userEntity, HttpServletRequest req, HttpServletResponse res) {
         try {
+            if (userEntity.getEmail().isBlank() || userEntity.getEmail().isEmpty()) {
+                String errorMessages = "Email is required!";
+
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                // If the user exists, return a message with a bad status
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
+            if (userEntity.getPassword().isBlank() || userEntity.getPassword().isEmpty()) {
+                String errorMessages = "Password is required!";
+
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                // If the user exists, return a message with a bad status
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
             UserDetails userDetails = userInfo.loadUserByUsername(userEntity.getEmail());
 
             System.out.println("userDetails" + " " + userDetails);
@@ -189,12 +209,12 @@ public class RegistrationServiceImp implements RegistrationService {
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (UsernameNotFoundException ex) {
             // Handle case when user is not found
-            CustomResponse<String> responseBody = new CustomResponse<>("Invalid email or password", "BAD_CREDENTIALS",
+            CustomResponse<String> responseBody = new CustomResponse<>("User details not found!", "BAD_CREDENTIALS",
                     HttpStatus.UNAUTHORIZED.value(), req.getRequestURI(), LocalDateTime.now());
             return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
         } catch (BadCredentialsException ex) {
             // Handle case when credentials are invalid
-            CustomResponse<String> responseBody = new CustomResponse<>("Invalid email or password", "BAD_CREDENTIALS",
+            CustomResponse<String> responseBody = new CustomResponse<>("Incorrect email or password", "BAD_CREDENTIALS",
                     HttpStatus.UNAUTHORIZED.value(), req.getRequestURI(), LocalDateTime.now());
             return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
         } catch (Exception ex) {

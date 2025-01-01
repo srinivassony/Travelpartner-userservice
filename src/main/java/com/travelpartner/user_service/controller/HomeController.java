@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dto.UserInfoDTO;
+import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.services.UserService;
 
@@ -84,7 +85,7 @@ public class HomeController {
         return userService.uploadMultipleImages(req, res, userDetails, files);
     }
 
-    @GetMapping("/get/user/details")
+    @GetMapping("/get/user/id")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> getUserDetailsById(HttpServletRequest req, HttpServletResponse res) {
 
@@ -94,4 +95,27 @@ public class HomeController {
 
     }
 
+    @PostMapping("/add/user/post")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> createUserPost(HttpServletRequest req,
+            HttpServletResponse res, @Valid @RequestBody UserPostDTO userPostDTO, BindingResult result) {
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
+        System.out.println("result"+" "+result);
+
+        if (result.hasErrors()) {
+            // Collecting error messages
+            StringBuilder errorMessages = new StringBuilder();
+
+            result.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append("; "));
+
+            System.out.println("errorMessages" + " " + errorMessages);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(errorMessages.toString(), "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+
+        return userService.createUserPost(req, res, userPostDTO, userDetails);
+    }
 }

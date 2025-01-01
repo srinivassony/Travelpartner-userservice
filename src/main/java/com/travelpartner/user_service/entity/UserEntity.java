@@ -15,7 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
 
 @Entity
 @Table(name = "tp_user")
@@ -65,7 +64,7 @@ public class UserEntity {
     private String phone;
 
     @Column(name = "DOB")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private String dob;
 
     @Column(name = "COUNTRY")
@@ -100,12 +99,17 @@ public class UserEntity {
     @OneToMany(mappedBy = "userGallery", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserGalleryEntity> galleryEntities;
 
+    @OneToMany(mappedBy = "userPost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserPostEntity> userPosts;
+
     public UserEntity() {
 
     }
 
-    public UserEntity(String userName, String email, String role, String password, String uuid, LocalDateTime createdAt,
+    public UserEntity(String id, String userName, String email, String role, String password, String uuid,
+            LocalDateTime createdAt,
             String createdBy) {
+        this.id = id;
         this.userName = userName;
         this.email = email;
         this.role = role;
@@ -298,6 +302,22 @@ public class UserEntity {
 
     public void setProfilePic(UserProfilePicEntity profilePic) {
         this.profilePic = profilePic;
+    }
+
+    public List<UserGalleryEntity> getGalleryEntities() {
+        return galleryEntities;
+    }
+
+    public void setGalleryEntities(List<UserGalleryEntity> galleryEntities) {
+        this.galleryEntities = galleryEntities;
+    }
+
+    public List<UserPostEntity> getUserPosts() {
+        return userPosts;
+    }
+
+    public void setUserPosts(List<UserPostEntity> userPosts) {
+        this.userPosts = userPosts;
     }
 
 }

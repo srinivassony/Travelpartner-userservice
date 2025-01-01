@@ -1,15 +1,17 @@
 package com.travelpartner.user_service.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class UserServiceDTO {
+
+    private String id;
 
     @Size(min = 2, max = 30, message = "Username must be between 2 and 50 characters")
     private String userName;
@@ -40,6 +42,68 @@ public class UserServiceDTO {
     private String createdBy;
 
     private Boolean isAdmin;
+
+    private LocalDateTime updatedAt;
+
+    private String updatedBy;
+
+    private UserProfilePicDTO userProfilePicEntity;
+
+    private List<UserGalleryDTO> userGalleryDTOList;
+
+    public UserServiceDTO() {
+
+    }
+
+    public UserServiceDTO(String country, LocalDateTime createdAt, String createdBy, String dob,
+            String email, String gender, String id,String uuid, String phone, String role,
+            String state, LocalDateTime updatedAt, String updatedBy, String userName) {
+        // Initialize fields
+        this.country = country;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.dob = dob;
+        this.email = email;
+        this.gender = gender;
+        this.id = id;
+        this.uuid = uuid;
+        this.phone = phone;
+        this.role = role;
+        this.state = state;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
+        this.userName = userName;
+    }
+
+    public UserServiceDTO(String country2, LocalDateTime createdAt2, String createdBy2, String dob2, String email2,
+            String gender2, String id2, String uuid2, String phone2, String role2, String state2,
+            LocalDateTime updatedAt2, String updatedBy2, String userName2, UserProfilePicDTO userProfilePicDTO,
+            List<UserGalleryDTO> userGalleryDTOList) {
+        this.country = country2;
+        this.createdAt = createdAt2;
+        this.createdBy = createdBy2;
+        this.dob = dob2;
+        this.email = email2;
+        this.gender = gender2;
+        this.id = id2;
+        this.uuid = uuid2;
+        this.phone = phone2;
+        this.role = role2;
+        this.state = state2;
+        this.updatedAt = updatedAt2;
+        this.updatedBy = updatedBy2;
+        this.userName = userName2;
+        this.userProfilePicEntity = userProfilePicDTO;
+        this.userGalleryDTOList = userGalleryDTOList;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getUserName() {
         return userName;
@@ -145,4 +209,35 @@ public class UserServiceDTO {
         this.isAdmin = isAdmin;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public UserProfilePicDTO getUserProfilePicEntity() {
+        return userProfilePicEntity;
+    }
+
+    public void setUserProfilePicEntity(UserProfilePicDTO userProfilePicEntity) {
+        this.userProfilePicEntity = userProfilePicEntity;
+    }
+
+    public List<UserGalleryDTO> getUserGalleryDTOList() {
+        return userGalleryDTOList;
+    }
+
+    public void setUserGalleryDTOList(List<UserGalleryDTO> userGalleryDTOList) {
+        this.userGalleryDTOList = userGalleryDTOList;
+    }
 }

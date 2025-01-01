@@ -36,6 +36,17 @@ public class UserGalleryDTO {
         this.userId = userId;
     }
 
+    public UserGalleryDTO(String id2, String imageId2, String fileName2, String userId2) {
+        this.id = id2;
+        this.imageId = imageId2;
+        this.fileName = fileName2;
+        this.userId = userId2;
+    }
+
+    public UserGalleryDTO() {
+       
+    }
+
     public String getId() {
         return id;
     }
