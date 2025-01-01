@@ -98,10 +98,24 @@ public class HomeController {
     @PostMapping("/add/user/post")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> createUserPost(HttpServletRequest req,
-            HttpServletResponse res, @RequestBody UserPostDTO userPostDTO) {
+            HttpServletResponse res, @Valid @RequestBody UserPostDTO userPostDTO, BindingResult result) {
         UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
-        System.out.println(userDetails.getUuid());
+        System.out.println("result"+" "+result);
 
-        return userService.createUserPost(req, res, userPostDTO);
+        if (result.hasErrors()) {
+            // Collecting error messages
+            StringBuilder errorMessages = new StringBuilder();
+
+            result.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append("; "));
+
+            System.out.println("errorMessages" + " " + errorMessages);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(errorMessages.toString(), "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+
+        return userService.createUserPost(req, res, userPostDTO, userDetails);
     }
 }

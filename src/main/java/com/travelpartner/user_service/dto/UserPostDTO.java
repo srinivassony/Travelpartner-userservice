@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotBlank;
 
 public class UserPostDTO {
 
+    private String id;
+    
     @NotBlank(message="Location is required")
     private String location;
 
@@ -25,6 +27,21 @@ public class UserPostDTO {
     private UserEntity userPost;
 
     private String userId;
+
+    public UserPostDTO() {
+    }
+
+    public UserPostDTO(String id, String location, String description, LocalDateTime createdAt, String createdBy,
+            LocalDateTime updatedAt, String updatedBy, String userId) {
+        this.id = id;
+        this.location = location;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.updatedAt=updatedAt;
+        this.updatedBy=updatedBy;
+        this.userId = userId;
+    }
 
     public String getLocation() {
         return location;
@@ -88,6 +105,16 @@ public class UserPostDTO {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+
+    public String getId() {
+        return id;
+    }
+
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     

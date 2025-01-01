@@ -25,6 +25,7 @@ import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
+import com.travelpartner.user_service.entity.UserPostEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
 import com.travelpartner.user_service.utill.Utills;
@@ -52,7 +53,6 @@ public class UserServiceImp implements UserService {
             HttpServletRequest req,
             HttpServletResponse res) {
         try {
-
             UserEntity updateUser = userDAO.updateUserInfo(userServiceDTO, userDetails);
 
             System.out.println("GETTING THE UPDATED USER DETAILS" + " " + updateUser);
@@ -195,12 +195,23 @@ public class UserServiceImp implements UserService {
             UserInfoDTO userDetails, MultipartFile[] files) {
         try {
 
-            List<UserGalleryDTO> userGalleryDetails = new ArrayList<>();
+            List<UserGalleryEntity> userGalleryDetails = new ArrayList<>();
 
             if (files == null || files.length == 0) {
                 String errorMessage = "No files provided.";
                 CustomResponse<String> responseBody = new CustomResponse<>(errorMessage, "BAD_REQUEST",
                         HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
+            Optional<UserEntity> userInfo = userDAO.getUserById(userDetails.getId());
+
+            if (userInfo.isEmpty()) {
+                String errorMessages = "User deatils not found!";
+
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
                 return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
             }
 
@@ -210,17 +221,6 @@ public class UserServiceImp implements UserService {
 
                 if (!fileName.matches(".*\\.(png|jpg|jpeg)$")) {
                     String errorMessages = "Invalid file type. Only PNG, JPG, JPEG files are allowed!";
-
-                    CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
-                            HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
-
-                    return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
-                }
-
-                Optional<UserEntity> userInfo = userDAO.getUserById(userDetails.getId());
-
-                if (userInfo.isEmpty()) {
-                    String errorMessages = "User deatils not found!";
 
                     CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
                             HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
@@ -245,12 +245,12 @@ public class UserServiceImp implements UserService {
                 userGalleryEntity.setCreatedBy(userDetails.getUuid());
                 userGalleryEntity.setUserGallery(userInfo.get());
 
-                UserGalleryDTO createUserGallery = userDAO.createUserImages(userGalleryEntity);
-
-                userGalleryDetails.add(createUserGallery);
+                userGalleryDetails.add(userGalleryEntity);
             }
 
-            CustomResponse<?> responseBody = new CustomResponse<>(userGalleryDetails, "UPDATED",
+            List<UserGalleryDTO> createUserGallery = userDAO.createUserImages(userGalleryDetails);
+
+            CustomResponse<?> responseBody = new CustomResponse<>(createUserGallery, "UPDATED",
                     HttpStatus.OK.value(),
                     req.getRequestURI(), LocalDateTime.now());
 
@@ -262,13 +262,11 @@ public class UserServiceImp implements UserService {
                     HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @Override
     public ResponseEntity<?> getUserDetailsById(HttpServletRequest req, HttpServletResponse res,
             UserInfoDTO userDetails) {
-
         try {
             System.out.println("82222222" + " " + userDetails.getId());
 
@@ -282,7 +280,6 @@ public class UserServiceImp implements UserService {
                         HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
 
                 return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
-
             }
 
             CustomResponse<?> responseBody = new CustomResponse<>(getUserDetails, "OK",
@@ -299,13 +296,47 @@ public class UserServiceImp implements UserService {
                     HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @Override
-    public ResponseEntity<?> createUserPost(HttpServletRequest req, HttpServletResponse res, UserPostDTO userPostDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createUserPost'");
+    public ResponseEntity<?> createUserPost(HttpServletRequest req, HttpServletResponse res, UserPostDTO userPostDTO,
+            UserInfoDTO userDetails) {
+        try {
+
+            Optional<UserEntity> userInfo = userDAO.getUserById(userDetails.getId());
+
+            if (userInfo.isEmpty()) {
+                String errorMessages = "User deatils not found!";
+
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
+            UserPostEntity setUserPost = new UserPostEntity();
+            setUserPost.setLocation(userPostDTO.getLocation());
+            setUserPost.setDescription(userPostDTO.getDescription());
+            setUserPost.setCreatedAt(LocalDateTime.now());
+            setUserPost.setCreatedBy(userDetails.getUuid());
+            setUserPost.setUserPost(userInfo.get());
+
+            UserPostDTO userPostInfo = userDAO.createUserPost(setUserPost);
+
+            CustomResponse<?> responseBody = new CustomResponse<>(userPostInfo, "SUCCESS",
+                    HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+        } catch (Exception e) {
+
+            String stackTrace = utills.getStackTraceAsString(e);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(stackTrace, "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
