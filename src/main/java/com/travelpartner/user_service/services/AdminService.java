@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
-import com.travelpartner.user_service.entity.UserEntity;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,12 +23,5 @@ public interface AdminService {
     ResponseEntity<?> deleteUser(HttpServletRequest req, HttpServletResponse res, String id);
 
     ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse res, MultipartFile file);
-
-
-    // ResponseEntity<?> getUsersWithPagination(HttpServletRequest req,
-    // HttpServletResponse res, int page, int size);
-
-    // ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse
-    // res, MultipartFile file);
 
 }
