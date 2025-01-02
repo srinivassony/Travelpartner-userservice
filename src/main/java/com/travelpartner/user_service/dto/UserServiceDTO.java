@@ -56,7 +56,7 @@ public class UserServiceDTO {
     }
 
     public UserServiceDTO(String country, LocalDateTime createdAt, String createdBy, String dob,
-            String email, String gender, String id,String uuid, String phone, String role,
+            String email, String gender, String id, String uuid, String phone, String role,
             String state, LocalDateTime updatedAt, String updatedBy, String userName) {
         // Initialize fields
         this.country = country;
@@ -95,6 +95,10 @@ public class UserServiceDTO {
         this.userName = userName2;
         this.userProfilePicEntity = userProfilePicDTO;
         this.userGalleryDTOList = userGalleryDTOList;
+    }
+
+    public UserServiceDTO(String email2) {
+        this.email = email2;
     }
 
     public String getId() {
