@@ -236,45 +236,59 @@ public class AdminServiceImp implements AdminService {
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
 
         }
-
     }
 
     @Override
     public ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse res, MultipartFile file) {
-
         try {
+
             if (file.isEmpty()) {
 
-                String errorMessage = "File is Empty !";
+                String errorMessage = "File is Empty!";
 
                 CustomResponse<String> responseBody = new CustomResponse<>(errorMessage, "NOT_FOUND",
                         HttpStatus.NOT_FOUND.value(), req.getRequestURI(), LocalDateTime.now());
 
                 return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
-
             }
 
             List<UserEntity> users = new ArrayList<>();
-            try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+
+            List<UserEntity> emails = new ArrayList<>();
+
+            try {
+                Workbook workbook = new XSSFWorkbook(file.getInputStream());
                 Sheet sheet = workbook.getSheetAt(0);
                 Row headerRow = sheet.getRow(0);
 
                 validateHeaders(headerRow);
 
-                System.out.println(sheet.getLastRowNum());
+                System.out.println("sheet no" + " " + sheet.getLastRowNum());
 
-                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                    Row row = sheet.getRow(i);
-                    UserEntity user = validateAndParseRow(row);
-                    users.add(user);
+                for (int emailIndex = 1; emailIndex <= sheet.getLastRowNum(); emailIndex++) {
+                    Row row = sheet.getRow(emailIndex);
+                    UserEntity user = new UserEntity();
+                    user.setEmail(row.getCell(1).toString());
+                    emails.add(user);
                 }
+
+                // for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                // Row row = sheet.getRow(i);
+                // UserEntity user = validateAndParseRow(row);
+                // users.add(user);
+                // }
+
+            } catch (Exception e) {
+
+                CustomResponse<String> responseBody = new CustomResponse<>(e.getMessage(),
+                        "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
             }
 
             // List<UserEntity> userList = adminDAO.uploadUserInfo(users);
 
-            List<UserEntity> userList = adminDAO.uploadUserInfo(users);
-
-            CustomResponse<?> responseBody = new CustomResponse<>(userList, "SUCCESS",
+            CustomResponse<?> responseBody = new CustomResponse<>(emails, "SUCCESS",
                     HttpStatus.OK.value(),
                     req.getRequestURI(), LocalDateTime.now());
 
@@ -291,35 +305,27 @@ public class AdminServiceImp implements AdminService {
     }
 
     private void validateHeaders(Row headerRow) {
-        List<String> requiredHeaders = List.of("username", "email", "phone", "country", "state", "dob");
-        for (int i = 0; i < requiredHeaders.size(); i++) {
+        String[] requiredHeaders = { "username", "email", "phone", "country", "state", "dob" };
+        for (int i = 0; i < requiredHeaders.length; i++) {
+            String header = requiredHeaders[i];
             Cell cell = headerRow.getCell(i);
-            if (cell == null || !requiredHeaders.get(i).equalsIgnoreCase(cell.getStringCellValue().trim())) {
-                throw new IllegalArgumentException("Invalid column name: " + requiredHeaders.get(i));
+            if (cell == null || !header.trim().equals(cell.toString().trim())) {
+                throw new IllegalArgumentException("Invalid column name: " + requiredHeaders[i]);
             }
         }
     }
 
     private UserEntity validateAndParseRow(Row row) {
         UserEntity user = new UserEntity();
-
         // Assuming the expected columns are in specific positions (adjust as needed)
         // For example, column 0 is "username", column 1 is "email", etc.
-
         user.setUuid(UUID.randomUUID().toString());
         // Read "username" (column 0)
         Cell usernameCell = row.getCell(0);
         if (usernameCell != null && usernameCell.getCellType() == CellType.STRING) {
             user.setUserName(usernameCell.getStringCellValue().trim());
-
-            // if (existingUserNames.contains(userName)) {
-            // throw new IllegalArgumentException("Duplicate username found: " + userName);
-            // }
-            // user.setUserName(userName);
-            // existingUserNames.add(userName);
         } else {
-            // Handle error if the value is not a string or is empty
-            throw new IllegalArgumentException("Please enter the field username");
+            throw new IllegalArgumentException("Please enter the field username!");
         }
 
         // Read "email" (column 1)
