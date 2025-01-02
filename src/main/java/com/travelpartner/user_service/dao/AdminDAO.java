@@ -29,4 +29,6 @@ public interface AdminDAO {
 
     List<UserEntity> uploadUserInfo(List<UserEntity> users);
 
+    List<UserEntity> getExisitingUsers(List<String> emails);
+
 }
