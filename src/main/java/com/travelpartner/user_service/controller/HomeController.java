@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -97,8 +98,9 @@ public class HomeController {
 
     @PostMapping("/add/user/post")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> createUserPost(HttpServletRequest req,
-            HttpServletResponse res, @Valid @RequestBody UserPostDTO userPostDTO, BindingResult result) {
+    public ResponseEntity<?> createUserPostAndImages(HttpServletRequest req,
+            HttpServletResponse res, @Valid @ModelAttribute UserPostDTO userPostDTO,
+            @RequestParam("files") MultipartFile[] files, BindingResult result) {
         UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
         System.out.println("result"+" "+result);
 
@@ -116,6 +118,6 @@ public class HomeController {
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
 
-        return userService.createUserPost(req, res, userPostDTO, userDetails);
+        return userService.createUserPostAndImages(req, res, userPostDTO, files,userDetails);
     }
 }

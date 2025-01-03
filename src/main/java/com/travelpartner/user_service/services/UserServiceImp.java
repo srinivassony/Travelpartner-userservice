@@ -26,6 +26,7 @@ import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserPostEntity;
+import com.travelpartner.user_service.entity.UserPostImageEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
 import com.travelpartner.user_service.utill.Utills;
@@ -299,9 +300,18 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> createUserPost(HttpServletRequest req, HttpServletResponse res, UserPostDTO userPostDTO,
+    public ResponseEntity<?> createUserPostAndImages(HttpServletRequest req, HttpServletResponse res, UserPostDTO userPostDTO, MultipartFile[] files,
             UserInfoDTO userDetails) {
         try {
+
+            List<UserPostImageEntity> userPostImageEntities = new ArrayList<>();
+
+            if (files == null || files.length == 0) {
+                String errorMessage = "No files provided.";
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessage, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
 
             Optional<UserEntity> userInfo = userDAO.getUserById(userDetails.getId());
 
@@ -321,7 +331,38 @@ public class UserServiceImp implements UserService {
             setUserPost.setCreatedBy(userDetails.getUuid());
             setUserPost.setUserPost(userInfo.get());
 
-            UserPostDTO userPostInfo = userDAO.createUserPost(setUserPost);
+            for (MultipartFile file : files) {
+
+                String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+                if (!fileName.matches(".*\\.(png|jpg|jpeg)$")) {
+                    String errorMessages = "Invalid file type. Only PNG, JPG, JPEG files are allowed!";
+
+                    CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                            HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                    return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+                }
+
+                String postFiledId = UUID.randomUUID().toString();
+                System.out.println("82222222" + " " + postFiledId);
+
+                Path userUploadPath = Paths.get(galleryDir, postFiledId);
+                System.out.println(userUploadPath);
+                Files.createDirectories(userUploadPath);
+                Path filePath = userUploadPath.resolve(fileName);
+                file.transferTo(filePath.toFile());
+
+                UserPostImageEntity setUserPostImageEntity = new UserPostImageEntity();
+                setUserPostImageEntity.setPostFileId(postFiledId);
+                setUserPostImageEntity.setPostFileName(fileName);
+                setUserPostImageEntity.setCreatedAt(LocalDateTime.now());
+                setUserPostImageEntity.setCreatedBy(userDetails.getUuid());
+
+                userPostImageEntities.add(setUserPostImageEntity);
+            }
+
+            UserPostDTO userPostInfo = userDAO.createUserPostAndImage(setUserPost, userPostImageEntities);
 
             CustomResponse<?> responseBody = new CustomResponse<>(userPostInfo, "SUCCESS",
                     HttpStatus.OK.value(),
