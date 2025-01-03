@@ -21,10 +21,6 @@ public interface AdminDAO {
 
     Optional<UserEntity> deleteUserInfo(String id);
 
-    // public List<UserEntity> uploadUserData(String name, String email, String
-    // phone, String role, String password,
-    // String country, String uuid);
-
     Optional<UserEntity> getUserInfoById(String id);
 
     List<UserEntity> uploadUserInfo(List<UserEntity> users);

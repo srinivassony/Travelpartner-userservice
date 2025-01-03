@@ -24,11 +24,4 @@ public interface AdminService {
 
     ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse res, MultipartFile file);
 
-
-    // ResponseEntity<?> getUsersWithPagination(HttpServletRequest req,
-    // HttpServletResponse res, int page, int size);
-
-    // ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse
-    // res, MultipartFile file);
-
 }
