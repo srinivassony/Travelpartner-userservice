@@ -8,11 +8,13 @@ import org.springframework.stereotype.Component;
 
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
+import com.travelpartner.user_service.dto.UserPostImgaesDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserPostEntity;
+import com.travelpartner.user_service.entity.UserPostImageEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
 
 @Component
@@ -114,6 +116,28 @@ public class UtillDTO {
 
 
     public UserPostDTO convertToUserPostDTO(UserPostEntity entity) {
+
+        List<UserPostImgaesDTO> userPostImgaesDTO = new ArrayList<>();
+        System.out.println("userPostImage-id"+" "+entity.getUserPostImageEntities());
+
+        if (entity.getUserPostImageEntities() != null && !entity.getUserPostImageEntities().isEmpty()) {
+
+            List<UserPostImageEntity> userPostImageList = entity.getUserPostImageEntities();
+            System.out.println("userPostImageList-id"+" "+userPostImageList.get(0));
+
+            for (UserPostImageEntity userPostImage : userPostImageList) {
+
+                System.out.println("userPostImage-id"+" "+userPostImage.getId());
+                UserPostImgaesDTO userPostImageDTOInfo = new UserPostImgaesDTO(
+                        userPostImage.getId(),
+                        userPostImage.getPostFileName(),
+                        userPostImage.getPostFileId(),
+                        userPostImage.getUserPostImages().getId());
+
+                userPostImgaesDTO.add(userPostImageDTOInfo);
+            }
+        }
+System.out.println("userPostImgaesDTO"+" "+userPostImgaesDTO);
         return new UserPostDTO(
                 entity.getId(),
                 entity.getLocation(),
@@ -122,7 +146,8 @@ public class UtillDTO {
                 entity.getCreatedBy(),
                 entity.getUpdatedAt(),
                 entity.getUpdatedBy(),
-                entity.getUserPost().getId());
+                entity.getUserPost().getId(),
+                userPostImgaesDTO);
     }
 
 }

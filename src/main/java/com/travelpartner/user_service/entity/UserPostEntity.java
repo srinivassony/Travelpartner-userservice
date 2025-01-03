@@ -119,4 +119,13 @@ public class UserPostEntity {
     public void setUserPost(UserEntity userPost) {
         this.userPost = userPost;
     }
+
+    public List<UserPostImageEntity> getUserPostImageEntities() {
+        return userPostImageEntities;
+    }
+
+    public void setUserPostImageEntities(List<UserPostImageEntity> userPostImageEntities) {
+        this.userPostImageEntities = userPostImageEntities;
+    }
+
 }

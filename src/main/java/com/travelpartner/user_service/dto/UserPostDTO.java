@@ -1,6 +1,7 @@
 package com.travelpartner.user_service.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.travelpartner.user_service.entity.UserEntity;
 
@@ -28,19 +29,22 @@ public class UserPostDTO {
 
     private String userId;
 
+    private List<UserPostImgaesDTO> userPostImgaesDTO;
+
     public UserPostDTO() {
     }
 
     public UserPostDTO(String id, String location, String description, LocalDateTime createdAt, String createdBy,
-            LocalDateTime updatedAt, String updatedBy, String userId) {
+            LocalDateTime updatedAt, String updatedBy, String userId, List<UserPostImgaesDTO> userPostImgaesDTO) {
         this.id = id;
         this.location = location;
         this.description = description;
         this.createdAt = createdAt;
         this.createdBy = createdBy;
-        this.updatedAt=updatedAt;
-        this.updatedBy=updatedBy;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
         this.userId = userId;
+        this.userPostImgaesDTO = userPostImgaesDTO;
     }
 
     public String getLocation() {
@@ -115,6 +119,14 @@ public class UserPostDTO {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public List<UserPostImgaesDTO> getUserPostImgaesDTO() {
+        return userPostImgaesDTO;
+    }
+
+    public void setUserPostImgaesDTO(List<UserPostImgaesDTO> userPostImgaesDTO) {
+        this.userPostImgaesDTO = userPostImgaesDTO;
     }
 
     

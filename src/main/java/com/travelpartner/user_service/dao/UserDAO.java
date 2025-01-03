@@ -10,6 +10,7 @@ import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserPostEntity;
+import com.travelpartner.user_service.entity.UserPostImageEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
@@ -30,5 +31,5 @@ public interface UserDAO {
 
     UserServiceDTO getUserInfoById(String id);
 
-    UserPostDTO createUserPost(UserPostEntity setUserPost);
+    UserPostDTO createUserPostAndImage(UserPostEntity setUserPost, List<UserPostImageEntity> userPostImageEntities);
 }

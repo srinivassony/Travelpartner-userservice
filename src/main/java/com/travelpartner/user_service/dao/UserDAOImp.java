@@ -1,6 +1,7 @@
 package com.travelpartner.user_service.dao;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,14 +17,17 @@ import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserPostEntity;
+import com.travelpartner.user_service.entity.UserPostImageEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
 import com.travelpartner.user_service.repository.UserGalleryRepo;
+import com.travelpartner.user_service.repository.UserPostImagesRepo;
 import com.travelpartner.user_service.repository.UserPostRepo;
 import com.travelpartner.user_service.repository.UserProfilePicRepo;
 import com.travelpartner.user_service.repository.UserRepository;
 import com.travelpartner.user_service.utill.UtillDTO;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserDAOImp implements UserDAO {
@@ -39,6 +43,9 @@ public class UserDAOImp implements UserDAO {
 
     @Autowired
     UserPostRepo userPostRepo;
+
+    @Autowired
+    UserPostImagesRepo userPostImagesRepo;
 
     @Autowired
     UtillDTO utillDTO;
@@ -130,8 +137,21 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public UserPostDTO createUserPost(UserPostEntity setUserPost) {
+    @Transactional
+    public UserPostDTO createUserPostAndImage(UserPostEntity setUserPost,
+            List<UserPostImageEntity> userPostImageEntities) {
+
         UserPostEntity userPostEntity = userPostRepo.save(setUserPost);
+
+        List<UserPostImageEntity> userPostImageList = new ArrayList<>();
+        for (UserPostImageEntity image : userPostImageEntities) {
+            image.setUserPostImages(userPostEntity);// Set the post for the image
+            UserPostImageEntity userPostImageEntity = userPostImagesRepo.save(image);
+            userPostImageList.add(userPostImageEntity);
+        }
+
+        userPostEntity.setUserPostImageEntities(userPostImageList);
+
         return utillDTO.convertToUserPostDTO(userPostEntity);
     }
 
