@@ -27,7 +27,17 @@ public class UserPostImgaesDTO {
 
     private String updatedBy;
 
+    private String postId;
+
 	private UserPostEntity userPostImages;
+
+    public UserPostImgaesDTO(String id, String postFileName,
+            String postFileId, String postId) {
+        this.id = id;
+        this.postFileName = postFileName;
+        this.postFileId = postFileId;
+        this.postId = postId;
+    }
 
     public String getId() {
         return id;
@@ -91,6 +101,14 @@ public class UserPostImgaesDTO {
 
     public void setUserPostImages(UserPostEntity userPostImages) {
         this.userPostImages = userPostImages;
+    }
+
+    public String getPostId() {
+        return postId;
+    }
+
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 
     

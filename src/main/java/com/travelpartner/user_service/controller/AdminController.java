@@ -1,7 +1,6 @@
 package com.travelpartner.user_service.controller;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -22,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
-import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.services.AdminService;
 
 import jakarta.servlet.http.HttpServletRequest;

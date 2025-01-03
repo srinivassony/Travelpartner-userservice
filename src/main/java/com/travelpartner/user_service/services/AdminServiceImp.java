@@ -277,6 +277,10 @@ public class AdminServiceImp implements AdminService {
 
                 for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                     Row row = sheet.getRow(i);
+                    // Skip rows where any cell has an empty string
+                    if (isRowEmpty(row)) {
+                        continue;
+                    }
                     UserEntity user = validateAndParseRow(row);
                     users.add(user);
                 }
@@ -304,16 +308,6 @@ public class AdminServiceImp implements AdminService {
                     return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
                 }
 
-                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                    Row row = sheet.getRow(i);
-                    System.out.println("therrrrrrrrrr111111111111111111111111111111");
-
-                    UserEntity user = validateAndParseRow(row);
-                    users.add(user);
-                    System.out.println("herrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-
-                }
-
             } catch (Exception e) {
 
                 CustomResponse<String> responseBody = new CustomResponse<>(e.getMessage(),
@@ -322,20 +316,8 @@ public class AdminServiceImp implements AdminService {
                 return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
 
             }
-            // Iterate over the users and add to the unique list if the email is not already
-            // in the set
-            List<UserEntity> uniqueUsers = new ArrayList<>();
-            Set<String> seenEmails = new HashSet<>();
 
-            for (UserEntity user : users) {
-                String email = user.getEmail();
-                if (!seenEmails.contains(email)) {
-                    seenEmails.add(email);
-                    uniqueUsers.add(user);
-                }
-            }
-
-            List<UserEntity> userList = adminDAO.uploadUserInfo(uniqueUsers);
+            List<UserEntity> userList = adminDAO.uploadUserInfo(users);
 
             CustomResponse<?> responseBody = new CustomResponse<>(userList, "SUCCESS",
                     HttpStatus.OK.value(),
@@ -344,8 +326,6 @@ public class AdminServiceImp implements AdminService {
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
 
         } catch (Exception e) {
-            String stackTrace = utills.getStackTraceAsString(e);
-
             CustomResponse<String> responseBody = new CustomResponse<>(e.getMessage(),
                     "BAD_REQUEST",
                     HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
@@ -363,6 +343,21 @@ public class AdminServiceImp implements AdminService {
         }
     }
 
+    private boolean isRowEmpty(Row row) {
+        if (row == null) {
+            return true;
+        }
+        for (Cell cell : row) {
+            if (cell != null && cell.getCellType() != CellType.BLANK) {
+                String cellValue = cell.toString().trim();
+                if (!cellValue.isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private UserEntity validateAndParseRow(Row row) {
         UserEntity user = new UserEntity();
 
@@ -376,7 +371,7 @@ public class AdminServiceImp implements AdminService {
             user.setUserName(usernameCell.getStringCellValue().trim());
         } else {
             // Handle error if the value is not a string or is empty
-            throw new IllegalArgumentException("Please enter the field username");
+            throw new IllegalArgumentException("Please enter the field username at " + (row.getRowNum() + 1));
         }
 
         // Read "email" (column 1)
@@ -384,7 +379,7 @@ public class AdminServiceImp implements AdminService {
         if (emailCell != null && emailCell.getCellType() == CellType.STRING) {
             user.setEmail(emailCell.getStringCellValue().trim());
         } else {
-            throw new IllegalArgumentException("Please enter the field email");
+            throw new IllegalArgumentException("Please enter the field email at " + (row.getRowNum() + 1));
         }
 
         // Read "phone" (column 2)
@@ -399,14 +394,14 @@ public class AdminServiceImp implements AdminService {
                     user.setPhone(phone);
                 } else {
                     throw new IllegalArgumentException(
-                            "Invalid phone number. Please enter a valid 10-digit phone number.");
+                            "Invalid phone number. Please enter a valid 10-digit phone number at" + (row.getRowNum() + 1));
                 }
             } else {
                 throw new IllegalArgumentException(
-                        "Invalid phone cell type. Phone number must be a string or numeric.");
+                        "Invalid phone cell type. Phone number must be a string or numeric at"+ (row.getRowNum() + 1));
             }
         } else {
-            throw new IllegalArgumentException("Phone field is missing. Please enter the phone number.");
+            throw new IllegalArgumentException("Phone field is missing. Please enter the phone number at "+ (row.getRowNum() + 1));
         }
 
         // Read "country" (column 3)
@@ -414,7 +409,7 @@ public class AdminServiceImp implements AdminService {
         if (countryCell != null && countryCell.getCellType() == CellType.STRING) {
             user.setCountry(countryCell.getStringCellValue().trim());
         } else {
-            throw new IllegalArgumentException("Please enter the field country");
+            throw new IllegalArgumentException("Please enter the field country at"+ (row.getRowNum() + 1));
         }
 
         // Read "state" (column 4)
@@ -422,7 +417,7 @@ public class AdminServiceImp implements AdminService {
         if (stateCell != null && stateCell.getCellType() == CellType.STRING) {
             user.setState(stateCell.getStringCellValue().trim());
         } else {
-            throw new IllegalArgumentException("Please enter the field state");
+            throw new IllegalArgumentException("Please enter the field state at"+ (row.getRowNum() + 1));
         }
         // Read "dob" (column 5), assuming it's a date (you can adjust for other
         // formats)
@@ -434,14 +429,14 @@ public class AdminServiceImp implements AdminService {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     user.setDob(sdf.format(dobCell.getDateCellValue())); // Convert date to string
                 } else {
-                    throw new IllegalArgumentException("Please enter the Valid dob");
+                    throw new IllegalArgumentException("Please enter the Valid dob at"+ (row.getRowNum() + 1));
                 }
             } else {
                 throw new IllegalArgumentException("DOB number should be in " +
-                        dobCell.getCellType());
+                        dobCell.getCellType()+ (row.getRowNum() + 1));
             }
         } else {
-            throw new IllegalArgumentException("Please enter the field dob");
+            throw new IllegalArgumentException("Please enter the field dob at "+ (row.getRowNum() + 1));
         }
 
         user.setRole("ROLE_USER,");
