@@ -105,26 +105,6 @@ public class AdminDAOImp implements AdminDAO {
         }
     }
 
-    // @Override
-    // public List<UserEntity> uploadUserData(String name, String email, String
-    // phone, String role, String password,
-    // String country, String uuid) {
-    // // TODO Auto-generated method stub
-
-    // UserEntity user = new UserEntity();
-    // user.setUserName(name);
-    // user.setEmail(email);
-    // user.setPhone(phone);
-    // user.setRole(role);
-    // user.setPassword(password);
-    // user.setCountry(country);
-    // user.setUuid(uuid);
-    // jpaUserRepo.save(user);
-
-    // return (List<UserEntity>) jpaUserRepo.save(user);
-
-    // }
-
     @Override
     public Optional<UserEntity> getUserInfoById(String id) {
         // TODO Auto-generated method stub

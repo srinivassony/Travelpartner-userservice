@@ -94,15 +94,6 @@ public class AdminController {
         return adminService.deleteUser(req, res, id);
     }
 
-    // @PostMapping("/upload/bluck/users")
-    // @PreAuthorize("hasRole('ROLE_ADMIN')")
-    // public ResponseEntity<?> uploadUserData(HttpServletRequest req,
-    // HttpServletResponse res,
-    // @RequestParam("file") MultipartFile file, UserServiceDTO userServiceDTO) {
-
-    // return adminService.uploadUsersData(req, res, file);
-    // }
-
     @PostMapping("/upload/bulk/users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> uploadUserData(HttpServletRequest req, HttpServletResponse res,
