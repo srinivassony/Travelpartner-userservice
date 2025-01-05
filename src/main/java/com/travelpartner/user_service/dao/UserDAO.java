@@ -1,6 +1,5 @@
 package com.travelpartner.user_service.dao;
 
-
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +10,7 @@ import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserPostEntity;
 import com.travelpartner.user_service.entity.UserPostImageEntity;
+import com.travelpartner.user_service.entity.PostLikeEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
@@ -32,4 +32,13 @@ public interface UserDAO {
     UserServiceDTO getUserInfoById(String id);
 
     UserPostDTO createUserPostAndImage(UserPostEntity setUserPost, List<UserPostImageEntity> userPostImageEntities);
+
+    Optional<PostLikeEntity> getPostLikeByIdAndUserId(String postId, String userId);
+
+    Optional<UserPostEntity> getUserPostById(String postId);
+
+    PostLikeEntity createPostLike(PostLikeEntity postLikeEntity);
+
+    PostLikeEntity updatePostLikeById(PostLikeEntity entity);
+
 }

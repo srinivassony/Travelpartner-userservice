@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.UserDAO;
+import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
@@ -27,6 +28,7 @@ import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserPostEntity;
 import com.travelpartner.user_service.entity.UserPostImageEntity;
+import com.travelpartner.user_service.entity.PostLikeEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
 import com.travelpartner.user_service.utill.Utills;
@@ -300,7 +302,8 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> createUserPostAndImages(HttpServletRequest req, HttpServletResponse res, UserPostDTO userPostDTO, MultipartFile[] files,
+    public ResponseEntity<?> createUserPostAndImages(HttpServletRequest req, HttpServletResponse res,
+            UserPostDTO userPostDTO, MultipartFile[] files,
             UserInfoDTO userDetails) {
         try {
 
@@ -378,6 +381,68 @@ public class UserServiceImp implements UserService {
                     HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @Override
+    public ResponseEntity<?> createPostLike(HttpServletRequest req, HttpServletResponse res, PostLikeDTO postLikeDTO,
+            UserInfoDTO userDetails) {
+        try {
+
+            Optional<UserPostEntity> getUserPostById = userDAO.getUserPostById(postLikeDTO.getPostId());
+
+            if (getUserPostById.isEmpty()) {
+                String errorMessages = "User post deatils not found!";
+
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
+            Optional<PostLikeEntity> getPostLikeById = userDAO.getPostLikeByIdAndUserId(postLikeDTO.getPostId(),
+                    userDetails.getId());
+
+            if (getPostLikeById.isEmpty()) {
+
+                PostLikeEntity postLikeEntity = new PostLikeEntity();
+                postLikeEntity.setIsLike(postLikeDTO.getIsLike());
+                postLikeEntity.setUserId(userDetails.getId());
+                postLikeEntity.setPostLike(getUserPostById.get());
+                postLikeEntity.setCreatedAt(LocalDateTime.now());
+                postLikeEntity.setCreatedBy(userDetails.getId());
+
+                PostLikeEntity createPostLike = userDAO.createPostLike(postLikeEntity);
+
+                CustomResponse<?> responseBody = new CustomResponse<>(createPostLike, "SUCCESS",
+                        HttpStatus.OK.value(),
+                        req.getRequestURI(), LocalDateTime.now());
+
+                return new ResponseEntity<>(responseBody, HttpStatus.OK);
+            } else {
+
+                PostLikeEntity entity = getPostLikeById.get();
+
+                entity.setIsLike(postLikeDTO.getIsLike());
+                entity.setUpdatedAt(LocalDateTime.now());
+                entity.setUpdatedBy(userDetails.getUuid());
+
+                PostLikeEntity updatePostLike = userDAO.updatePostLikeById(entity);
+
+                CustomResponse<?> responseBody = new CustomResponse<>(updatePostLike, "SUCCESS",
+                        HttpStatus.OK.value(),
+                        req.getRequestURI(), LocalDateTime.now());
+
+                return new ResponseEntity<>(responseBody, HttpStatus.OK);
+            }
+
+        } catch (Exception e) {
+            String stackTrace = utills.getStackTraceAsString(e);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(stackTrace, "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
 }

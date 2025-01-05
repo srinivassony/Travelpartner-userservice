@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.travelpartner.user_service.config.CustomResponse;
+import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
@@ -102,7 +103,7 @@ public class HomeController {
             HttpServletResponse res, @Valid @ModelAttribute UserPostDTO userPostDTO,
             @RequestParam("files") MultipartFile[] files, BindingResult result) {
         UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
-        System.out.println("result"+" "+result);
+        System.out.println("result" + " " + result);
 
         if (result.hasErrors()) {
             // Collecting error messages
@@ -118,6 +119,30 @@ public class HomeController {
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
 
-        return userService.createUserPostAndImages(req, res, userPostDTO, files,userDetails);
+        return userService.createUserPostAndImages(req, res, userPostDTO, files, userDetails);
+    }
+
+    @PostMapping("/post/like")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> createPostLike(HttpServletRequest req, HttpServletResponse res,
+            @Valid @RequestBody PostLikeDTO postLikeDTO, BindingResult result) {
+
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
+
+        if (result.hasErrors()) {
+            // Collecting error messages
+            StringBuilder errorMessages = new StringBuilder();
+
+            result.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append("; "));
+
+            System.out.println("errorMessages" + " " + errorMessages);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(errorMessages.toString(), "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+
+        return userService.createPostLike(req, res, postLikeDTO, userDetails);
     }
 }

@@ -22,6 +22,7 @@ public interface AdminService {
 
     ResponseEntity<?> deleteUser(HttpServletRequest req, HttpServletResponse res, String id);
 
-    ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse res, MultipartFile file);
+    ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse res, MultipartFile file,
+            UserInfoDTO userDetails);
 
 }

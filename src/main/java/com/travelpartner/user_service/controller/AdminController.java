@@ -98,9 +98,9 @@ public class AdminController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> uploadUserData(HttpServletRequest req, HttpServletResponse res,
             @RequestParam("file") MultipartFile file) {
-        System.out.println("File upload endpoint hit");
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
 
-        return adminService.uploadUsersData(req, res, file);
+        return adminService.uploadUsersData(req, res, file, userDetails);
     }
 
 }

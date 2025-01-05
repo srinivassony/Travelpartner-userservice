@@ -14,11 +14,13 @@ import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
+import com.travelpartner.user_service.entity.PostLikeEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserPostEntity;
 import com.travelpartner.user_service.entity.UserPostImageEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
+import com.travelpartner.user_service.repository.PostLikeRepo;
 import com.travelpartner.user_service.repository.UserGalleryRepo;
 import com.travelpartner.user_service.repository.UserPostImagesRepo;
 import com.travelpartner.user_service.repository.UserPostRepo;
@@ -46,6 +48,9 @@ public class UserDAOImp implements UserDAO {
 
     @Autowired
     UserPostImagesRepo userPostImagesRepo;
+
+    @Autowired
+    PostLikeRepo postLikeRepo;
 
     @Autowired
     UtillDTO utillDTO;
@@ -131,7 +136,7 @@ public class UserDAOImp implements UserDAO {
     public UserServiceDTO getUserInfoById(String id) {
 
         UserEntity userEntity = jpaUserRepo.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("User with ID " + id + " not found."));
+                .orElseThrow(() -> new EntityNotFoundException("User with ID " + id + " not found."));
 
         return utillDTO.convertToUserDTO(userEntity);
     }
@@ -153,6 +158,26 @@ public class UserDAOImp implements UserDAO {
         userPostEntity.setUserPostImageEntities(userPostImageList);
 
         return utillDTO.convertToUserPostDTO(userPostEntity);
+    }
+
+    @Override
+    public Optional<PostLikeEntity> getPostLikeByIdAndUserId(String postId, String userId) {
+        return postLikeRepo.findByUserIdAndPostLike_Id(userId, postId);
+    }
+
+    @Override
+    public Optional<UserPostEntity> getUserPostById(String postId) {
+        return userPostRepo.findById(postId);
+    }
+
+    @Override
+    public PostLikeEntity createPostLike(PostLikeEntity postLikeEntity) {
+        return postLikeRepo.save(postLikeEntity);
+    }
+
+    @Override
+    public PostLikeEntity updatePostLikeById(PostLikeEntity entity) {
+        return postLikeRepo.save(entity);
     }
 
 }

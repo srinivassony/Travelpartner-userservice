@@ -242,7 +242,8 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse res, MultipartFile file) {
+    public ResponseEntity<?> uploadUsersData(HttpServletRequest req, HttpServletResponse res, MultipartFile file,
+            UserInfoDTO userDetails) {
 
         try {
             if (file.isEmpty()) {
@@ -281,7 +282,7 @@ public class AdminServiceImp implements AdminService {
                     if (isRowEmpty(row)) {
                         continue;
                     }
-                    UserEntity user = validateAndParseRow(row);
+                    UserEntity user = validateAndParseRow(row, userDetails);
                     users.add(user);
                 }
 
@@ -358,7 +359,7 @@ public class AdminServiceImp implements AdminService {
         return true;
     }
 
-    private UserEntity validateAndParseRow(Row row) {
+    private UserEntity validateAndParseRow(Row row, UserInfoDTO userDetails) {
         UserEntity user = new UserEntity();
 
         // Assuming the expected columns are in specific positions (adjust as needed)
@@ -394,14 +395,16 @@ public class AdminServiceImp implements AdminService {
                     user.setPhone(phone);
                 } else {
                     throw new IllegalArgumentException(
-                            "Invalid phone number. Please enter a valid 10-digit phone number at" + (row.getRowNum() + 1));
+                            "Invalid phone number. Please enter a valid 10-digit phone number at"
+                                    + (row.getRowNum() + 1));
                 }
             } else {
                 throw new IllegalArgumentException(
-                        "Invalid phone cell type. Phone number must be a string or numeric at"+ (row.getRowNum() + 1));
+                        "Invalid phone cell type. Phone number must be a string or numeric at" + (row.getRowNum() + 1));
             }
         } else {
-            throw new IllegalArgumentException("Phone field is missing. Please enter the phone number at "+ (row.getRowNum() + 1));
+            throw new IllegalArgumentException(
+                    "Phone field is missing. Please enter the phone number at " + (row.getRowNum() + 1));
         }
 
         // Read "country" (column 3)
@@ -409,7 +412,7 @@ public class AdminServiceImp implements AdminService {
         if (countryCell != null && countryCell.getCellType() == CellType.STRING) {
             user.setCountry(countryCell.getStringCellValue().trim());
         } else {
-            throw new IllegalArgumentException("Please enter the field country at"+ (row.getRowNum() + 1));
+            throw new IllegalArgumentException("Please enter the field country at" + (row.getRowNum() + 1));
         }
 
         // Read "state" (column 4)
@@ -417,7 +420,7 @@ public class AdminServiceImp implements AdminService {
         if (stateCell != null && stateCell.getCellType() == CellType.STRING) {
             user.setState(stateCell.getStringCellValue().trim());
         } else {
-            throw new IllegalArgumentException("Please enter the field state at"+ (row.getRowNum() + 1));
+            throw new IllegalArgumentException("Please enter the field state at" + (row.getRowNum() + 1));
         }
         // Read "dob" (column 5), assuming it's a date (you can adjust for other
         // formats)
@@ -429,22 +432,23 @@ public class AdminServiceImp implements AdminService {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     user.setDob(sdf.format(dobCell.getDateCellValue())); // Convert date to string
                 } else {
-                    throw new IllegalArgumentException("Please enter the Valid dob at"+ (row.getRowNum() + 1));
+                    throw new IllegalArgumentException("Please enter the Valid dob at" + (row.getRowNum() + 1));
                 }
             } else {
                 throw new IllegalArgumentException("DOB number should be in " +
-                        dobCell.getCellType()+ (row.getRowNum() + 1));
+                        dobCell.getCellType() + (row.getRowNum() + 1));
             }
         } else {
-            throw new IllegalArgumentException("Please enter the field dob at "+ (row.getRowNum() + 1));
+            throw new IllegalArgumentException("Please enter the field dob at " + (row.getRowNum() + 1));
         }
 
         user.setRole("ROLE_USER,");
+        user.setCreatedAt(LocalDateTime.now());
+        user.setCreatedBy(userDetails.getUuid());
 
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             user.setPassword(generateRandomPassword()); // Set a random password if it's not provided
         }
-        System.out.println(user.getUserName());
         return user;
     }
 

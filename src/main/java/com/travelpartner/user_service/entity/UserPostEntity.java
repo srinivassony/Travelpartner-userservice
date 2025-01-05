@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -52,6 +53,9 @@ public class UserPostEntity {
 
     @OneToMany(mappedBy = "userPostImages", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserPostImageEntity> userPostImageEntities;
+
+    @OneToOne(mappedBy = "postLike", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private PostLikeEntity postLikeEntity;
 
     public UserPostEntity() {
     }
@@ -126,6 +130,14 @@ public class UserPostEntity {
 
     public void setUserPostImageEntities(List<UserPostImageEntity> userPostImageEntities) {
         this.userPostImageEntities = userPostImageEntities;
+    }
+
+    public PostLikeEntity getPostLikeEntity() {
+        return postLikeEntity;
+    }
+
+    public void setPostLikeEntity(PostLikeEntity postLikeEntity) {
+        this.postLikeEntity = postLikeEntity;
     }
 
 }
