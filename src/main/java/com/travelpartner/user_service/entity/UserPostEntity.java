@@ -57,6 +57,9 @@ public class UserPostEntity {
     @OneToOne(mappedBy = "postLike", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PostLikeEntity postLikeEntity;
 
+    @OneToMany(mappedBy = "postComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PostCommentEntity> postCommentEntity;
+
     public UserPostEntity() {
     }
 
@@ -138,6 +141,14 @@ public class UserPostEntity {
 
     public void setPostLikeEntity(PostLikeEntity postLikeEntity) {
         this.postLikeEntity = postLikeEntity;
+    }
+
+    public List<PostCommentEntity> getPostCommentEntity() {
+        return postCommentEntity;
+    }
+
+    public void setPostCommentEntity(List<PostCommentEntity> postCommentEntity) {
+        this.postCommentEntity = postCommentEntity;
     }
 
 }

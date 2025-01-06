@@ -2,25 +2,31 @@ package com.travelpartner.user_service.dao;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.travelpartner.user_service.dto.PostCommentDTO;
 import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
+import com.travelpartner.user_service.dto.UserPostsViewDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
+import com.travelpartner.user_service.entity.PostCommentEntity;
 import com.travelpartner.user_service.entity.PostLikeEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserPostEntity;
 import com.travelpartner.user_service.entity.UserPostImageEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
+import com.travelpartner.user_service.repository.PostCommentRepo;
 import com.travelpartner.user_service.repository.PostLikeRepo;
 import com.travelpartner.user_service.repository.UserGalleryRepo;
 import com.travelpartner.user_service.repository.UserPostImagesRepo;
@@ -28,6 +34,8 @@ import com.travelpartner.user_service.repository.UserPostRepo;
 import com.travelpartner.user_service.repository.UserProfilePicRepo;
 import com.travelpartner.user_service.repository.UserRepository;
 import com.travelpartner.user_service.utill.UtillDTO;
+import com.travelpartner.user_service.dto.UserPostsViewDTO;
+
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -52,6 +60,9 @@ public class UserDAOImp implements UserDAO {
 
     @Autowired
     PostLikeRepo postLikeRepo;
+
+    @Autowired
+    PostCommentRepo postCommentRepo;
 
     @Autowired
     UtillDTO utillDTO;
@@ -181,6 +192,35 @@ public class UserDAOImp implements UserDAO {
     public PostLikeDTO updatePostLikeById(PostLikeEntity entity) {
         PostLikeEntity postLikeEntityInfo =  postLikeRepo.save(entity);
         return utillDTO.convertToPostLikeDTO(postLikeEntityInfo);
+    }
+
+    @Override
+    public PostCommentDTO createPostComment(PostCommentEntity postCommentEntity) {
+        PostCommentEntity entity = postCommentRepo.save(postCommentEntity);
+        return utillDTO.convertToPostCommentDTO(entity);
+    }
+
+    @Override
+    public List<UserPostsViewDTO> getUserPostsList() {
+        List<Object[]> results = userPostRepo.fetchUserPosts();
+
+        List<UserPostsViewDTO> userPostsList = new ArrayList<>();
+
+        // Map each record to a UserPostsViewDTO
+        results.forEach(record -> userPostsList.add(new UserPostsViewDTO(
+                (String) record[0], // id
+                (String) record[1], // userName
+                (String) record[2], // location
+                (String) record[3], // description
+                (String) record[4], // profilePicId
+                (String) record[5], // profilePicName
+                (String) record[6], // userId
+                record[7] != null ? record[7].toString() : null, // postImages (handle null)
+                record[8] != null ? ((Number) record[8]).intValue() : 0, // likesCount
+                record[9] != null ? ((Number) record[9]).intValue() : 0 // commentsCount
+        )));
+
+        return userPostsList;
     }
 
 }

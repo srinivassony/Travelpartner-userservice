@@ -3,14 +3,17 @@ package com.travelpartner.user_service.dao;
 import java.util.List;
 import java.util.Optional;
 
+import com.travelpartner.user_service.dto.PostCommentDTO;
 import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
+import com.travelpartner.user_service.dto.UserPostsViewDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserPostEntity;
 import com.travelpartner.user_service.entity.UserPostImageEntity;
+import com.travelpartner.user_service.entity.PostCommentEntity;
 import com.travelpartner.user_service.entity.PostLikeEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
@@ -41,5 +44,9 @@ public interface UserDAO {
     PostLikeDTO createPostLike(PostLikeEntity postLikeEntity);
 
     PostLikeDTO updatePostLikeById(PostLikeEntity entity);
+
+    PostCommentDTO createPostComment(PostCommentEntity postCommentEntity);
+
+    List<UserPostsViewDTO> getUserPostsList();
 
 }

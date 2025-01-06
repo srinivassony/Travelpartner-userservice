@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.travelpartner.user_service.config.CustomResponse;
+import com.travelpartner.user_service.dto.PostCommentDTO;
 import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
@@ -144,5 +145,38 @@ public class HomeController {
         }
 
         return userService.createPostLike(req, res, postLikeDTO, userDetails);
+    }
+
+    @PostMapping("/post/comment")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> createPostComment(HttpServletRequest req, HttpServletResponse res,
+            @Valid @RequestBody  PostCommentDTO postCommentDTO, BindingResult result) {
+
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
+
+        if (result.hasErrors()) {
+            // Collecting error messages
+            StringBuilder errorMessages = new StringBuilder();
+
+            result.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append("; "));
+
+            System.out.println("errorMessages" + " " + errorMessages);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(errorMessages.toString(), "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+
+        return userService.createPostComment(req, res, postCommentDTO, userDetails);
+    }
+
+    @GetMapping("/users/posts")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> FetchUserPosts(HttpServletRequest req, HttpServletResponse res) {
+
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
+
+        return userService.FetchUserPosts(req, res, userDetails);
     }
 }

@@ -19,15 +19,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.UserDAO;
+import com.travelpartner.user_service.dto.PostCommentDTO;
 import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
+import com.travelpartner.user_service.dto.UserPostsViewDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserPostEntity;
 import com.travelpartner.user_service.entity.UserPostImageEntity;
+import com.travelpartner.user_service.entity.PostCommentEntity;
 import com.travelpartner.user_service.entity.PostLikeEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserProfilePicEntity;
@@ -443,6 +446,67 @@ public class UserServiceImp implements UserService {
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @Override
+    public ResponseEntity<?> createPostComment(HttpServletRequest req, HttpServletResponse res,
+            PostCommentDTO postCommentDTO, UserInfoDTO userDetails) {
+        try {
+
+            Optional<UserPostEntity> getUserPostById = userDAO.getUserPostById(postCommentDTO.getPostId());
+
+            if (getUserPostById.isEmpty()) {
+                String errorMessages = "User post deatils not found!";
+
+                CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "BAD_REQUEST",
+                        HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+
+                return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+            }
+
+            PostCommentEntity postCommentEntity = new PostCommentEntity();
+            postCommentEntity.setCommentInfo(postCommentDTO.getCommentInfo());
+            postCommentEntity.setUserId(userDetails.getId());
+            postCommentEntity.setPostComment(getUserPostById.get());
+            postCommentEntity.setCreatedAt(LocalDateTime.now());
+            postCommentEntity.setCreatedBy(userDetails.getUuid());
+
+            PostCommentDTO createPostComment = userDAO.createPostComment(postCommentEntity);
+
+            CustomResponse<?> responseBody = new CustomResponse<>(createPostComment, "SUCCESS",
+                    HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+        } catch (Exception e) {
+            String stackTrace = utills.getStackTraceAsString(e);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(stackTrace, "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> FetchUserPosts(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails) {
+        try {
+
+            List<UserPostsViewDTO> getUserPostList = userDAO.getUserPostsList();
+
+            CustomResponse<?> responseBody = new CustomResponse<>(getUserPostList, "SUCCESS",
+                    HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+        } catch (Exception e) {
+            String stackTrace = utills.getStackTraceAsString(e);
+
+            CustomResponse<String> responseBody = new CustomResponse<>(e.getMessage(), "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
