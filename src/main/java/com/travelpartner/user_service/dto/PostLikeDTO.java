@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import com.travelpartner.user_service.entity.UserPostEntity;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -14,9 +16,8 @@ public class PostLikeDTO {
 
     private UserPostEntity postLike;
 
-    @NotBlank(message = "Like is required!")
-    @NotEmpty(message = "Like filed should not empty.")
-    @NotNull(message = "Like filed should not null.")
+    @Min(0)
+    @Max(1)
     private int isLike = 0;
 
     @NotBlank(message = "User id is required!")
@@ -32,7 +33,22 @@ public class PostLikeDTO {
 
     private String updatedBy;
 
+    @NotBlank(message = "Post id is required!")
+    @NotEmpty(message = "Post id filed should not empty.")
+    @NotNull(message = "Post id filed should not null.")
     private String postId;
+
+    public PostLikeDTO(String id, int isLike, String userId, String postId, LocalDateTime createdAt, String createdBy,
+            LocalDateTime updatedAt, String updatedBy) {
+        this.id = id;
+        this.isLike = isLike;
+        this.postId = postId;
+        this.userId = userId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.createdBy = createdBy;
+        this.updatedBy = updatedBy;
+    }
 
     public String getId() {
         return id;

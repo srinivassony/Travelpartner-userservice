@@ -6,11 +6,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
 import com.travelpartner.user_service.dto.UserPostImgaesDTO;
 import com.travelpartner.user_service.dto.UserProfilePicDTO;
 import com.travelpartner.user_service.dto.UserServiceDTO;
+import com.travelpartner.user_service.entity.PostLikeEntity;
 import com.travelpartner.user_service.entity.UserEntity;
 import com.travelpartner.user_service.entity.UserGalleryEntity;
 import com.travelpartner.user_service.entity.UserPostEntity;
@@ -148,6 +150,18 @@ System.out.println("userPostImgaesDTO"+" "+userPostImgaesDTO);
                 entity.getUpdatedBy(),
                 entity.getUserPost().getId(),
                 userPostImgaesDTO);
+    }
+
+    public PostLikeDTO convertToPostLikeDTO(PostLikeEntity postLikeEntityInfo) {
+        return new PostLikeDTO(
+                postLikeEntityInfo.getId(),
+                postLikeEntityInfo.getIsLike(),
+                postLikeEntityInfo.getUserId(),
+                postLikeEntityInfo.getPostLike().getId(),
+                postLikeEntityInfo.getCreatedAt(),
+                postLikeEntityInfo.getCreatedBy(),
+                postLikeEntityInfo.getUpdatedAt(),
+                postLikeEntityInfo.getUpdatedBy());
     }
 
 }

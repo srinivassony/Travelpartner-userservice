@@ -3,6 +3,7 @@ package com.travelpartner.user_service.dao;
 import java.util.List;
 import java.util.Optional;
 
+import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
@@ -37,8 +38,8 @@ public interface UserDAO {
 
     Optional<UserPostEntity> getUserPostById(String postId);
 
-    PostLikeEntity createPostLike(PostLikeEntity postLikeEntity);
+    PostLikeDTO createPostLike(PostLikeEntity postLikeEntity);
 
-    PostLikeEntity updatePostLikeById(PostLikeEntity entity);
+    PostLikeDTO updatePostLikeById(PostLikeEntity entity);
 
 }

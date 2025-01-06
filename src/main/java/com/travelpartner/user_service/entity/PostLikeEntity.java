@@ -22,10 +22,6 @@ public class PostLikeEntity {
     @Column(name = "id")
     private String id;
 
-    @OneToOne
-    @JoinColumn(name = "POST_ID", referencedColumnName = "id", nullable = false)
-    private UserPostEntity postLike;
-
     @Column(name = "is_like", nullable = false)
     private int isLike = 0;
 
@@ -45,6 +41,10 @@ public class PostLikeEntity {
 
     @Column(name = "UPDATED_BY")
     private String updatedBy;
+
+    @OneToOne
+    @JoinColumn(name = "POST_ID", referencedColumnName = "id", nullable = false)
+    private UserPostEntity postLike;
 
     public String getId() {
         return id;

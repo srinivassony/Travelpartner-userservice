@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
 import com.travelpartner.user_service.dto.UserPostDTO;
@@ -171,13 +172,15 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public PostLikeEntity createPostLike(PostLikeEntity postLikeEntity) {
-        return postLikeRepo.save(postLikeEntity);
+    public PostLikeDTO createPostLike(PostLikeEntity postLikeEntity) {
+        PostLikeEntity postLikeEntityInfo =  postLikeRepo.save(postLikeEntity);
+        return utillDTO.convertToPostLikeDTO(postLikeEntityInfo);
     }
 
     @Override
-    public PostLikeEntity updatePostLikeById(PostLikeEntity entity) {
-        return postLikeRepo.save(entity);
+    public PostLikeDTO updatePostLikeById(PostLikeEntity entity) {
+        PostLikeEntity postLikeEntityInfo =  postLikeRepo.save(entity);
+        return utillDTO.convertToPostLikeDTO(postLikeEntityInfo);
     }
 
 }

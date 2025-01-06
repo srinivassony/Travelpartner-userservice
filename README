@@ -1,4 +1,4 @@
-We need to start the application by using this command - mvn spring-bbot:run
+We need to start the application by using this command - mvn spring-boot:run
 
 Before start the user service we need to exceuted the below commands
 

@@ -411,7 +411,7 @@ public class UserServiceImp implements UserService {
                 postLikeEntity.setCreatedAt(LocalDateTime.now());
                 postLikeEntity.setCreatedBy(userDetails.getId());
 
-                PostLikeEntity createPostLike = userDAO.createPostLike(postLikeEntity);
+                PostLikeDTO createPostLike = userDAO.createPostLike(postLikeEntity);
 
                 CustomResponse<?> responseBody = new CustomResponse<>(createPostLike, "SUCCESS",
                         HttpStatus.OK.value(),
@@ -426,7 +426,7 @@ public class UserServiceImp implements UserService {
                 entity.setUpdatedAt(LocalDateTime.now());
                 entity.setUpdatedBy(userDetails.getUuid());
 
-                PostLikeEntity updatePostLike = userDAO.updatePostLikeById(entity);
+                PostLikeDTO updatePostLike = userDAO.updatePostLikeById(entity);
 
                 CustomResponse<?> responseBody = new CustomResponse<>(updatePostLike, "SUCCESS",
                         HttpStatus.OK.value(),
