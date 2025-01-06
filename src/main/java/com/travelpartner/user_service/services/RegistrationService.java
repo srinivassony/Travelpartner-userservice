@@ -1,7 +1,6 @@
 package com.travelpartner.user_service.services;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.travelpartner.user_service.dto.UserServiceDTO;
 import com.travelpartner.user_service.entity.UserEntity;

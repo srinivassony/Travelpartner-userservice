@@ -2,7 +2,6 @@ package com.travelpartner.user_service.services;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.RegistrationDAO;
