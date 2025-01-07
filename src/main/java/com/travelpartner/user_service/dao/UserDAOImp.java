@@ -215,7 +215,7 @@ public class UserDAOImp implements UserDAO {
         Session session = entityManager.unwrap(Session.class);
         session.doWork(connection -> {
             try {
-                CallableStatement callableStatement = connection.prepareCall("{ ? = call rp_function_fetch_users_posts_v1(?) }");
+                CallableStatement callableStatement = connection.prepareCall("{ ? = call rp_function_fetch_users_posts_userId_v1(?) }");
                 callableStatement.registerOutParameter(1, OracleTypes.CURSOR);
                 callableStatement.setString(2, userId);
                 callableStatement.execute();

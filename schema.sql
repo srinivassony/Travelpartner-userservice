@@ -1,6 +1,6 @@
 -- fetch user posts
-CREATE OR REPLACE FUNCTION rp_function_fetch_users_posts_v1(
-    userId IN VARCHAR2
+CREATE OR REPLACE FUNCTION rp_function_fetch_users_posts__v1(
+    searchKey IN VARCHAR2
 )
 RETURN SYS_REFCURSOR IS 
     userPostList SYS_REFCURSOR;
@@ -44,4 +44,4 @@ END;
 
 -- grants for above function
 
-GRANT EXECUTE ON rp_function_fetch_users_posts_v1 TO travelpartner;
+GRANT EXECUTE ON rp_function_fetch_users_posts__v1 TO travelpartner;
