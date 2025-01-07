@@ -48,6 +48,14 @@ public class CustomErrorController implements ErrorController {
 					HttpStatus.FORBIDDEN.value(), request.getRequestURI(), LocalDateTime.now());
 
 			return new ResponseEntity<>(responseBody, HttpStatus.FORBIDDEN);
+		} else if (statusCode == 405) {
+
+			String errorMessages = "The HTTP method used is not allowed for this request. Please check the request method and try again.";
+
+			CustomResponse<String> responseBody = new CustomResponse<>(errorMessages, "METHOD_NOT_ALLOWED",
+					HttpStatus.METHOD_NOT_ALLOWED.value(), request.getRequestURI(), LocalDateTime.now());
+
+			return new ResponseEntity<>(responseBody, HttpStatus.FORBIDDEN);
 		} else {
 			System.out.println("herrrrrrr");
 

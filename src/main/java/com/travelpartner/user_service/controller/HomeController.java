@@ -171,12 +171,12 @@ public class HomeController {
         return userService.createPostComment(req, res, postCommentDTO, userDetails);
     }
 
-    @GetMapping("/users/posts")
+    @GetMapping("/users/posts/userId")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> FetchUserPosts(HttpServletRequest req, HttpServletResponse res) {
+    public ResponseEntity<?> FetchUserPostsByUserId(HttpServletRequest req, HttpServletResponse res) {
 
         UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
 
-        return userService.FetchUserPosts(req, res, userDetails);
+        return userService.FetchUserPostsByUserId(req, res, userDetails);
     }
 }

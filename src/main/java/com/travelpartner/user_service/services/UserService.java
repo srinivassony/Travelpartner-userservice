@@ -35,6 +35,6 @@ public interface UserService {
         ResponseEntity<?> createPostComment(HttpServletRequest req, HttpServletResponse res,
                 PostCommentDTO postCommentDTO, UserInfoDTO userDetails);
 
-        ResponseEntity<?> FetchUserPosts(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails);
+        ResponseEntity<?> FetchUserPostsByUserId(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails);
 
 }

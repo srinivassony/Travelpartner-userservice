@@ -1,5 +1,8 @@
 package com.travelpartner.user_service.dao;
 
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.hibernate.Session;
+import org.hibernate.dialect.OracleTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -36,7 +41,7 @@ import com.travelpartner.user_service.repository.UserRepository;
 import com.travelpartner.user_service.utill.UtillDTO;
 import com.travelpartner.user_service.dto.UserPostsViewDTO;
 
-
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
@@ -66,6 +71,9 @@ public class UserDAOImp implements UserDAO {
 
     @Autowired
     UtillDTO utillDTO;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Override
     public UserEntity updateUserInfo(UserServiceDTO userServiceDTO, UserInfoDTO userDetails) {
@@ -201,26 +209,41 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public List<UserPostsViewDTO> getUserPostsList() {
-        List<Object[]> results = userPostRepo.fetchUserPosts();
-
+    public List<UserPostsViewDTO> getUserPostsByUserIdList(String userId) {
         List<UserPostsViewDTO> userPostsList = new ArrayList<>();
 
-        // Map each record to a UserPostsViewDTO
-        results.forEach(record -> userPostsList.add(new UserPostsViewDTO(
-                (String) record[0], // id
-                (String) record[1], // userName
-                (String) record[2], // location
-                (String) record[3], // description
-                (String) record[4], // profilePicId
-                (String) record[5], // profilePicName
-                (String) record[6], // userId
-                record[7] != null ? record[7].toString() : null, // postImages (handle null)
-                record[8] != null ? ((Number) record[8]).intValue() : 0, // likesCount
-                record[9] != null ? ((Number) record[9]).intValue() : 0 // commentsCount
-        )));
+        Session session = entityManager.unwrap(Session.class);
+        session.doWork(connection -> {
+            try {
+                CallableStatement callableStatement = connection.prepareCall("{ ? = call rp_function_fetch_users_posts_v1(?) }");
+                callableStatement.registerOutParameter(1, OracleTypes.CURSOR);
+                callableStatement.setString(2, userId);
+                callableStatement.execute();
 
+                try {
+                    ResultSet resultSet =  (ResultSet) callableStatement.getObject(1);
+                    while (resultSet.next()) {
+                        UserPostsViewDTO userPost = new UserPostsViewDTO(
+                                resultSet.getString("id"),
+                                resultSet.getString("userName"),
+                                resultSet.getString("location"),
+                                resultSet.getString("description"),
+                                resultSet.getString("profilePicId"),
+                                resultSet.getString("profilePicName"),
+                                resultSet.getString("userId"),
+                                resultSet.getString("postImages"),
+                                resultSet.getInt("likesCount"),
+                                resultSet.getInt("commentsCount")
+                        );
+                        userPostsList.add(userPost);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
         return userPostsList;
     }
-
 }

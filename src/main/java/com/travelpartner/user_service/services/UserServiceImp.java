@@ -489,10 +489,10 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> FetchUserPosts(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails) {
+    public ResponseEntity<?> FetchUserPostsByUserId(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails) {
         try {
 
-            List<UserPostsViewDTO> getUserPostList = userDAO.getUserPostsList();
+            List<UserPostsViewDTO> getUserPostList = userDAO.getUserPostsByUserIdList(userDetails.getId());
 
             CustomResponse<?> responseBody = new CustomResponse<>(getUserPostList, "SUCCESS",
                     HttpStatus.OK.value(),
@@ -501,8 +501,6 @@ public class UserServiceImp implements UserService {
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
 
         } catch (Exception e) {
-            String stackTrace = utills.getStackTraceAsString(e);
-
             CustomResponse<String> responseBody = new CustomResponse<>(e.getMessage(), "BAD_REQUEST",
                     HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
             return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);

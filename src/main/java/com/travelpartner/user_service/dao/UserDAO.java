@@ -47,6 +47,6 @@ public interface UserDAO {
 
     PostCommentDTO createPostComment(PostCommentEntity postCommentEntity);
 
-    List<UserPostsViewDTO> getUserPostsList();
+    List<UserPostsViewDTO> getUserPostsByUserIdList(String userId);
 
 }
