@@ -37,4 +37,7 @@ public interface UserService {
 
         ResponseEntity<?> FetchUserPostsByUserId(HttpServletRequest req, HttpServletResponse res, UserInfoDTO userDetails);
 
+        ResponseEntity<?> FetchUserPosts(HttpServletRequest req, HttpServletResponse res, String searchKey,
+                UserInfoDTO userDetails);
+
 }

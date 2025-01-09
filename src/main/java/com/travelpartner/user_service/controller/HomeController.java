@@ -179,4 +179,14 @@ public class HomeController {
 
         return userService.FetchUserPostsByUserId(req, res, userDetails);
     }
+
+    @PostMapping("/users/posts")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> FetchUserPosts(HttpServletRequest req, HttpServletResponse res,
+            @RequestParam String searchKey) {
+
+        UserInfoDTO userDetails = (UserInfoDTO) req.getAttribute("user");
+
+        return userService.FetchUserPosts(req, res, searchKey, userDetails);
+    }
 }

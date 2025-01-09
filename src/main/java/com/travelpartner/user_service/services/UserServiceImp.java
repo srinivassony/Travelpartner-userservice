@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travelpartner.user_service.config.CustomResponse;
 import com.travelpartner.user_service.dao.UserDAO;
 import com.travelpartner.user_service.dto.PostCommentDTO;
@@ -493,6 +495,26 @@ public class UserServiceImp implements UserService {
         try {
 
             List<UserPostsViewDTO> getUserPostList = userDAO.getUserPostsByUserIdList(userDetails.getId());
+
+            CustomResponse<?> responseBody = new CustomResponse<>(getUserPostList, "SUCCESS",
+                    HttpStatus.OK.value(),
+                    req.getRequestURI(), LocalDateTime.now());
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+
+        } catch (Exception e) {
+            CustomResponse<String> responseBody = new CustomResponse<>(e.getMessage(), "BAD_REQUEST",
+                    HttpStatus.BAD_REQUEST.value(), req.getRequestURI(), LocalDateTime.now());
+            return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> FetchUserPosts(HttpServletRequest req, HttpServletResponse res, String searchKey,
+            UserInfoDTO userDetails) {
+        try {
+
+            List<UserPostsViewDTO> getUserPostList = userDAO.getUserPostsList(searchKey);
 
             CustomResponse<?> responseBody = new CustomResponse<>(getUserPostList, "SUCCESS",
                     HttpStatus.OK.value(),
