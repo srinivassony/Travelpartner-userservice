@@ -1,5 +1,7 @@
 package com.travelpartner.user_service.dto;
 
+import java.util.List;
+
 public class UserPostsViewDTO {
 
     private String id;
@@ -9,16 +11,17 @@ public class UserPostsViewDTO {
     private String profilePicId;
     private String profilePicName;
     private String userId;
-    private String postImages; // Will store JSON array as a String
+    private List<PostImageDTO> postImages; // Will store JSON array as a String
     private int likesCount;
     private int commentsCount;
+    private int totalCount;
 
     public UserPostsViewDTO() {
     }
 
     public UserPostsViewDTO(String id, String userName, String location, String description,
             String profilePicId, String profilePicName, String userId,
-            String postImages, int likesCount, int commentsCount) {
+            List<PostImageDTO> postImages, int likesCount, int commentsCount, int totalCount) {
         this.id = id;
         this.userName = userName;
         this.location = location;
@@ -29,6 +32,7 @@ public class UserPostsViewDTO {
         this.postImages = postImages;
         this.likesCount = likesCount;
         this.commentsCount = commentsCount;
+        this.totalCount = totalCount;
     }
 
     public String getId() {
@@ -73,12 +77,6 @@ public class UserPostsViewDTO {
     public void setUserId(String userId) {
         this.userId = userId;
     }
-    public String getPostImages() {
-        return postImages;
-    }
-    public void setPostImages(String postImages) {
-        this.postImages = postImages;
-    }
 
     public int getLikesCount() {
         return likesCount;
@@ -95,7 +93,21 @@ public class UserPostsViewDTO {
     public void setCommentsCount(int commentsCount) {
         this.commentsCount = commentsCount;
     }
-   
 
-    
+    public List<PostImageDTO> getPostImages() {
+        return postImages;
+    }
+
+    public void setPostImages(List<PostImageDTO> postImages) {
+        this.postImages = postImages;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+   
 }

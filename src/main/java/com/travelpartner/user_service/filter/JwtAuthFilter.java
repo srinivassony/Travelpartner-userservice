@@ -32,6 +32,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 	UserInfo userInfo;
 
 	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		String path = request.getRequestURI();
+
+		// ✅ Skip JWT filter for public APIs
+		return path.startsWith("/api/v1/") ||
+				path.startsWith("/auth/") ||
+				path.startsWith("/public/");
+	}
+
+	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 

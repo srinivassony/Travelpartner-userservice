@@ -16,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travelpartner.user_service.dto.PostCommentDTO;
+import com.travelpartner.user_service.dto.PostImageDTO;
 import com.travelpartner.user_service.dto.PostLikeDTO;
 import com.travelpartner.user_service.dto.UserGalleryDTO;
 import com.travelpartner.user_service.dto.UserInfoDTO;
@@ -39,7 +42,6 @@ import com.travelpartner.user_service.repository.UserPostRepo;
 import com.travelpartner.user_service.repository.UserProfilePicRepo;
 import com.travelpartner.user_service.repository.UserRepository;
 import com.travelpartner.user_service.utill.UtillDTO;
-import com.travelpartner.user_service.dto.UserPostsViewDTO;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -211,11 +213,11 @@ public class UserDAOImp implements UserDAO {
     @Override
     public List<UserPostsViewDTO> getUserPostsByUserIdList(String userId) {
         List<UserPostsViewDTO> userPostsList = new ArrayList<>();
-
+        ObjectMapper objectMapper = new ObjectMapper();
         Session session = entityManager.unwrap(Session.class);
         session.doWork(connection -> {
             try {
-                CallableStatement callableStatement = connection.prepareCall("{ ? = call rp_function_fetch_users_posts_v1(?) }");
+                CallableStatement callableStatement = connection.prepareCall("{ ? = call rp_function_fetch_users_posts_userId_v1(?) }");
                 callableStatement.registerOutParameter(1, OracleTypes.CURSOR);
                 callableStatement.setString(2, userId);
                 callableStatement.execute();
@@ -223,6 +225,11 @@ public class UserDAOImp implements UserDAO {
                 try {
                     ResultSet resultSet =  (ResultSet) callableStatement.getObject(1);
                     while (resultSet.next()) {
+                          // Parse postImages JSON into a List<PostImage>
+                        List<PostImageDTO> postImages = objectMapper.readValue(
+                                resultSet.getString("postImages"),
+                                new TypeReference<List<PostImageDTO>>() {
+                                });
                         UserPostsViewDTO userPost = new UserPostsViewDTO(
                                 resultSet.getString("id"),
                                 resultSet.getString("userName"),
@@ -231,9 +238,55 @@ public class UserDAOImp implements UserDAO {
                                 resultSet.getString("profilePicId"),
                                 resultSet.getString("profilePicName"),
                                 resultSet.getString("userId"),
-                                resultSet.getString("postImages"),
+                                postImages,
                                 resultSet.getInt("likesCount"),
-                                resultSet.getInt("commentsCount")
+                                resultSet.getInt("commentsCount"),
+                                resultSet.getInt("totalCount")
+                        );
+                        userPostsList.add(userPost);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+        return userPostsList;
+    }
+
+    @Override
+    public List<UserPostsViewDTO> getUserPostsList(String searchKey) {
+        List<UserPostsViewDTO> userPostsList = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Session session = entityManager.unwrap(Session.class);
+        session.doWork(connection -> {
+            try {
+                CallableStatement callableStatement = connection.prepareCall("{ ? = call rp_function_fetch_users_posts_v1(?) }");
+                callableStatement.registerOutParameter(1, OracleTypes.CURSOR);
+                callableStatement.setString(2, searchKey);
+                callableStatement.execute();
+
+                try {
+                    ResultSet resultSet =  (ResultSet) callableStatement.getObject(1);
+                    while (resultSet.next()) {
+                          // Parse postImages JSON into a List<PostImage>
+                        List<PostImageDTO> postImages = objectMapper.readValue(
+                                resultSet.getString("postImages"),
+                                new TypeReference<List<PostImageDTO>>() {
+                                });
+                        UserPostsViewDTO userPost = new UserPostsViewDTO(
+                                resultSet.getString("id"),
+                                resultSet.getString("userName"),
+                                resultSet.getString("location"),
+                                resultSet.getString("description"),
+                                resultSet.getString("profilePicId"),
+                                resultSet.getString("profilePicName"),
+                                resultSet.getString("userId"),
+                                postImages,
+                                resultSet.getInt("likesCount"),
+                                resultSet.getInt("commentsCount"),
+                                resultSet.getInt("totalCount")
                         );
                         userPostsList.add(userPost);
                     }

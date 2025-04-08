@@ -49,4 +49,6 @@ public interface UserDAO {
 
     List<UserPostsViewDTO> getUserPostsByUserIdList(String userId);
 
+    List<UserPostsViewDTO> getUserPostsList(String searchKey);
+
 }
