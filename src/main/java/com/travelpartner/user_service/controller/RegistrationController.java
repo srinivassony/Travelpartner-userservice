@@ -66,7 +66,7 @@ public class RegistrationController {
 		return registrationService.onBoardinguserInfo(req, res, id);
 	}
 
-	@PostMapping("/add/user/admin")
+	@PostMapping("/add/admin")
 	public ResponseEntity<?> createUserAdmin(@Valid @RequestBody UserServiceDTO userServiceDTO, BindingResult result,
 			HttpServletRequest req, HttpServletResponse res) {
 
@@ -87,5 +87,4 @@ public class RegistrationController {
 
 		return registrationService.createUserInfo(userServiceDTO, req, res);
 	}
-
 }

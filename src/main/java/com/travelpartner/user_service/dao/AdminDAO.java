@@ -3,8 +3,6 @@ package com.travelpartner.user_service.dao;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.poi.ss.usermodel.Sheet;
-import org.hibernate.query.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.travelpartner.user_service.dto.UserInfoDTO;
